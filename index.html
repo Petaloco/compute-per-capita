@@ -113,16 +113,7 @@
         }
 
         .nav-logo .logo-mark {
-            width: 20px;
-            height: 20px;
-            border-radius: 5px;
-            background: linear-gradient(135deg, var(--accent), var(--mint));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.6rem;
-            color: #fff;
-            font-weight: 700;
+            display: none;
         }
 
         .nav-right {
@@ -301,8 +292,8 @@
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border-top: 1px solid var(--border);
-            padding: 0.75rem 1.5rem;
-            padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+            padding: 0.75rem 1.5rem 1.25rem;
+            padding-bottom: max(1.25rem, calc(env(safe-area-inset-bottom) + 0.75rem));
         }
 
         .input-bar-inner {
@@ -320,9 +311,10 @@
             display: flex;
             background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: 14px;
+            border-radius: 18px;
             overflow: hidden;
             transition: all 0.3s ease;
+            align-items: flex-end;
         }
 
         .input-wrap:focus-within {
@@ -330,31 +322,42 @@
             box-shadow: 0 0 0 3px var(--accent-soft), 0 -4px 24px var(--card-hover-shadow);
         }
 
-        .input-wrap input {
+        .input-wrap textarea {
             flex: 1;
             background: transparent;
             border: none;
-            padding: 0.9rem 1.25rem;
+            padding: 1rem 1.25rem;
             color: var(--text);
             font-family: 'Inter', sans-serif;
             font-size: 0.9rem;
             font-weight: 300;
             outline: none;
+            resize: none;
+            line-height: 1.5;
+            min-height: 3.25rem;
+            max-height: 8rem;
+            overflow-y: auto;
         }
 
-        .input-wrap input::placeholder { color: var(--text-muted); }
+        .input-wrap textarea::placeholder { color: var(--text-muted); }
 
         .input-wrap button {
             background: var(--accent);
             border: none;
-            padding: 0 1.75rem;
+            width: 40px;
+            height: 40px;
+            min-width: 40px;
+            border-radius: 12px;
+            margin: 0.4rem;
             color: #fff;
             font-family: 'Inter', sans-serif;
-            font-size: 0.8rem;
+            font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
-            letter-spacing: 0.02em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         [data-theme="dark"] .input-wrap button { color: #080b12; }
@@ -682,8 +685,8 @@
             <button onclick="runQuery('Show AI research leaders')">AI Research</button>
         </div>
         <div class="input-wrap">
-            <input type="text" id="query" placeholder="Ask anything about global compute..." autofocus>
-            <button id="askBtn" onclick="handleQuery()">Explore</button>
+            <textarea id="query" rows="2" placeholder="Ask anything about global compute..." autofocus></textarea>
+            <button id="askBtn" onclick="handleQuery()" aria-label="Explore">&#8593;</button>
         </div>
     </div>
 </div>
@@ -1162,7 +1165,14 @@ async function handleQuery() {
 }
 
 function runQuery(q) { document.getElementById('query').value = q; handleQuery(); }
-document.getElementById('query').addEventListener('keydown', e => { if (e.key === 'Enter') handleQuery(); });
+document.getElementById('query').addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleQuery(); }
+});
+// Auto-resize textarea
+document.getElementById('query').addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 128) + 'px';
+});
 </script>
 
 </body>
