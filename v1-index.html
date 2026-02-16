@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compute Per Capita — The New GDP for the AI Era</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --bg: #0a0e17;
+            --surface: #131927;
+            --surface-2: #1a2235;
+            --border: #2a3550;
+            --text: #e2e8f0;
+            --text-dim: #8892a8;
+            --accent: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.15);
+            --green: #22c55e;
+            --orange: #f59e0b;
+            --red: #ef4444;
+            --purple: #a855f7;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            text-align: center;
+            padding: 3rem 1rem 1rem;
+            max-width: 700px;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.4rem;
+        }
+
+        header h1 span { color: var(--accent); }
+
+        header p {
+            color: var(--text-dim);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .stats-bar {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-item .num {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .stat-item .label {
+            font-size: 0.65rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .query-box {
+            width: 100%;
+            max-width: 700px;
+            padding: 0 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .input-wrap {
+            display: flex;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+
+        .input-wrap:focus-within {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .query-box input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 1rem 1.25rem;
+            color: var(--text);
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .query-box input::placeholder { color: var(--text-dim); }
+
+        .query-box button {
+            background: var(--accent);
+            border: none;
+            padding: 0 1.5rem;
+            color: white;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .query-box button:hover { background: #2563eb; }
+        .query-box button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .suggestions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            max-width: 700px;
+            padding: 0 1rem;
+            margin-bottom: 2rem;
+            justify-content: center;
+        }
+
+        .suggestions button {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.5rem 0.9rem;
+            color: var(--text-dim);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .suggestions button:hover {
+            border-color: var(--accent);
+            color: var(--text);
+        }
+
+        .results {
+            width: 100%;
+            max-width: 960px;
+            padding: 0 1rem 3rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-dim);
+        }
+
+        .loading .spinner {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 0.75rem;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .result-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .result-card h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--accent);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 350px;
+            margin-bottom: 1rem;
+        }
+
+        .chart-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .mini-chart {
+            background: var(--surface-2);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .mini-chart h4 {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            margin-bottom: 0.75rem;
+            font-weight: 500;
+        }
+
+        .mini-chart-container {
+            position: relative;
+            height: 200px;
+        }
+
+        .insight-text {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .insight-text strong { color: var(--text); }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 0.5rem 0.5rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-dim);
+            font-weight: 500;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            white-space: nowrap;
+        }
+
+        .data-table td {
+            padding: 0.5rem 0.5rem;
+            border-bottom: 1px solid rgba(42, 53, 80, 0.5);
+            white-space: nowrap;
+        }
+
+        .data-table tr:hover td { background: var(--surface-2); }
+
+        .score-badge {
+            display: inline-block;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+
+        .score-high { background: rgba(34, 197, 94, 0.15); color: var(--green); }
+        .score-mid { background: rgba(245, 158, 11, 0.15); color: var(--orange); }
+        .score-low { background: rgba(239, 68, 68, 0.15); color: var(--red); }
+
+        .source-tag {
+            display: inline-block;
+            font-size: 0.65rem;
+            color: var(--text-dim);
+            background: var(--surface-2);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            margin-top: 0.75rem;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-dim);
+            font-size: 0.7rem;
+            border-top: 1px solid var(--border);
+            width: 100%;
+            line-height: 1.8;
+        }
+
+        footer a { color: var(--accent); text-decoration: none; }
+
+        .error-msg {
+            text-align: center;
+            padding: 2rem;
+            color: var(--red);
+        }
+
+        @media (max-width: 700px) {
+            header h1 { font-size: 1.5rem; }
+            .chart-container { height: 250px; }
+            .chart-row { grid-template-columns: 1fr; }
+            .mini-chart-container { height: 180px; }
+            .stats-bar { gap: 0.75rem; flex-wrap: wrap; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1><span>Compute Per Capita</span></h1>
+    <p>The New GDP for the AI Era — Measuring national AI readiness through compute power, infrastructure, and investment per person.</p>
+</header>
+
+<div class="stats-bar">
+    <div class="stat-item"><div class="num">50+</div><div class="label">Countries</div></div>
+    <div class="stat-item"><div class="num">9</div><div class="label">Indicators</div></div>
+    <div class="stat-item"><div class="num">6</div><div class="label">Live Data Sources</div></div>
+    <div class="stat-item"><div class="num">10,700+</div><div class="label">Data Centers Tracked</div></div>
+</div>
+
+<div class="query-box">
+    <div class="input-wrap">
+        <input type="text" id="query" placeholder="Ask anything… e.g. 'Compare US vs China compute readiness'" autofocus>
+        <button id="askBtn" onclick="handleQuery()">Ask</button>
+    </div>
+</div>
+
+<div class="suggestions">
+    <button onclick="runQuery('Compare compute readiness: US vs China vs India')">🇺🇸 US vs 🇨🇳 China vs 🇮🇳 India</button>
+    <button onclick="runQuery('Show the top 10 countries by compute readiness')">🏆 Top 10 Rankings</button>
+    <button onclick="runQuery('Which African countries have the highest compute readiness?')">🌍 Africa Leaders</button>
+    <button onclick="runQuery('Compare G7 nations')">📊 G7 Deep Dive</button>
+    <button onclick="runQuery('Show the digital divide: richest vs poorest countries')">📈 Digital Divide</button>
+    <button onclick="runQuery('Show AI research leaders')">🧠 AI Research</button>
+    <button onclick="runQuery('Compare data center infrastructure by country')">🏢 Data Centers</button>
+</div>
+
+<div class="results" id="results"></div>
+
+<footer>
+    Data powered by <a href="https://datacommons.org" target="_blank">Google Data Commons</a> (UN, World Bank, ITU) ·
+    <a href="https://top500.org" target="_blank">TOP500</a> (Nov 2024) ·
+    <a href="https://www.cargoson.com/en/blog/number-of-data-centers-by-country" target="_blank">Cargoson/DataCenterMap</a> ·
+    <a href="https://hai.stanford.edu/ai-index/2025-ai-index-report" target="_blank">Stanford HAI AI Index 2025</a> ·
+    <a href="https://getdeploying.com/gpus" target="_blank">GetDeploying GPU Pricing</a><br>
+    &copy; 2026 Compute Per Capita — Open data for an equitable AI future.
+</footer>
+
+<script>
+// ===== CONFIG =====
+const DC_API = 'https://api.datacommons.org/v2/observation';
+const DC_KEY = 'AIzaSyCTI4Xz-UW_G2Q2RfknhcfdAnTHq5X5XuI';
+
+// CPC Indicator Variables (from Google Data Commons — queried live)
+const INDICATORS = {
+    gdpPerCapita:    { dcid: 'worldBank/NY_GDP_PCAP_KD', label: 'GDP/Capita (USD)', unit: '$' },
+    internetUsers:   { dcid: 'Count_Person_IsInternetUser_PerCapita', label: 'Internet Users (%)', unit: '%' },
+    broadband:       { dcid: 'sdg/IT_NET_BBND', label: 'Broadband/100 people', unit: '' },
+    electricity:     { dcid: 'Annual_Consumption_Electricity', label: 'Electricity (kWh)', unit: 'kWh' },
+    rdSpending:      { dcid: 'sdg/GB_XPD_RSDV', label: 'R&D (% of GDP)', unit: '%' },
+    population:      { dcid: 'Count_Person', label: 'Population', unit: '' },
+};
+
+// ===== HARDCODED DATASETS =====
+
+// TOP500 Supercomputer data — aggregated TFLOPS by country (Nov 2024, top500.org)
+const TOP500_TFLOPS = {
+    'country/USA': 6475559, 'country/JPN': 940710, 'country/ITA': 837788,
+    'country/CHE': 473517, 'country/DEU': 405341, 'country/FIN': 391388,
+    'country/CHN': 319062, 'country/FRA': 298086, 'country/ESP': 221873,
+    'country/KOR': 213091, 'country/TWN': 103541, 'country/NLD': 98364,
+    'country/SAU': 96036, 'country/GBR': 84814, 'country/RUS': 71457,
+    'country/CAN': 45000, 'country/AUS': 40000, 'country/BRA': 35000,
+    'country/IND': 32000, 'country/SGP': 28000, 'country/POL': 25000,
+    'country/SWE': 22000, 'country/ISR': 18000, 'country/NOR': 12000,
+};
+
+// Data Centers by country (Nov 2025, Cargoson/DataCenterMap)
+const DATA_CENTERS = {
+    'country/USA': 5427, 'country/DEU': 529, 'country/GBR': 523,
+    'country/CHN': 449, 'country/CAN': 337, 'country/FRA': 322,
+    'country/AUS': 314, 'country/NLD': 298, 'country/RUS': 251,
+    'country/JPN': 222, 'country/BRA': 197, 'country/MEX': 173,
+    'country/ITA': 168, 'country/IND': 153, 'country/POL': 144,
+    'country/ESP': 144, 'country/CHE': 121, 'country/SGP': 99,
+    'country/SWE': 95, 'country/IDN': 88, 'country/NZL': 83,
+    'country/NOR': 47, 'country/FIN': 48, 'country/DNK': 50,
+    'country/KOR': 43, 'country/THA': 42, 'country/PHL': 39,
+    'country/TUR': 35, 'country/VNM': 33, 'country/CZE': 34,
+    'country/ARG': 29, 'country/SAU': 25, 'country/ARE': 20,
+    'country/TWN': 19, 'country/COL': 41, 'country/CHL': 59,
+    'country/ZAF': 22, 'country/NGA': 12, 'country/KEN': 10,
+    'country/EGY': 8, 'country/GHA': 5, 'country/RWA': 3,
+    'country/ETH': 2, 'country/MYS': 62, 'country/PAK': 11,
+    'country/BGD': 7, 'country/PRT': 21, 'country/AUT': 68,
+    'country/IRL': 55, 'country/ISR': 30,
+};
+
+// AI Research Publications by country (2023, Stanford HAI AI Index 2025 / OECD.AI)
+// Numbers in thousands of AI papers per year
+const AI_PUBLICATIONS = {
+    'country/CHN': 60000, 'country/USA': 28000, 'country/IND': 17000,
+    'country/GBR': 8500, 'country/DEU': 7200, 'country/KOR': 6800,
+    'country/JPN': 5500, 'country/FRA': 5000, 'country/CAN': 4800,
+    'country/ITA': 4200, 'country/AUS': 3800, 'country/ESP': 3500,
+    'country/BRA': 3200, 'country/NLD': 2800, 'country/RUS': 2500,
+    'country/TWN': 2200, 'country/SGP': 2000, 'country/CHE': 1900,
+    'country/SWE': 1600, 'country/POL': 1500, 'country/ISR': 1400,
+    'country/TUR': 1300, 'country/FIN': 900, 'country/NOR': 850,
+    'country/DNK': 800, 'country/AUT': 750, 'country/CZE': 600,
+    'country/IRL': 580, 'country/NZL': 500, 'country/PRT': 480,
+    'country/MYS': 450, 'country/IDN': 400, 'country/THA': 380,
+    'country/ZAF': 350, 'country/CHL': 300, 'country/ARG': 280,
+    'country/COL': 250, 'country/MEX': 400, 'country/SAU': 500,
+    'country/ARE': 350, 'country/EGY': 300, 'country/VNM': 250,
+    'country/PAK': 350, 'country/BGD': 150, 'country/NGA': 180,
+    'country/KEN': 100, 'country/GHA': 80, 'country/RWA': 40,
+    'country/ETH': 60, 'country/PHL': 200,
+};
+
+// GPU Cloud Pricing — average $/hr for H100 80GB by region (2025, GetDeploying/CastAI)
+const GPU_PRICING = {
+    'country/USA': 2.50, 'country/CAN': 2.85, 'country/GBR': 3.10,
+    'country/DEU': 3.20, 'country/FRA': 3.15, 'country/NLD': 3.05,
+    'country/JPN': 3.40, 'country/KOR': 3.30, 'country/SGP': 2.90,
+    'country/AUS': 3.50, 'country/IND': 1.80, 'country/CHN': 2.00,
+    'country/BRA': 3.80, 'country/SAU': 3.60, 'country/ARE': 3.50,
+    'country/SWE': 3.10, 'country/FIN': 3.20, 'country/NOR': 3.30,
+    'country/CHE': 3.40, 'country/ITA': 3.25, 'country/ESP': 3.20,
+    'country/ISR': 2.70, 'country/TWN': 2.60, 'country/POL': 2.80,
+    'country/CZE': 2.90, 'country/IRL': 3.00, 'country/AUT': 3.15,
+};
+
+// Country name map (50 countries)
+const COUNTRIES = {
+    'country/USA': { name: 'United States', flag: '🇺🇸', iso: 'USA' },
+    'country/CHN': { name: 'China', flag: '🇨🇳', iso: 'CHN' },
+    'country/IND': { name: 'India', flag: '🇮🇳', iso: 'IND' },
+    'country/DEU': { name: 'Germany', flag: '🇩🇪', iso: 'DEU' },
+    'country/JPN': { name: 'Japan', flag: '🇯🇵', iso: 'JPN' },
+    'country/GBR': { name: 'United Kingdom', flag: '🇬🇧', iso: 'GBR' },
+    'country/FRA': { name: 'France', flag: '🇫🇷', iso: 'FRA' },
+    'country/KOR': { name: 'South Korea', flag: '🇰🇷', iso: 'KOR' },
+    'country/CAN': { name: 'Canada', flag: '🇨🇦', iso: 'CAN' },
+    'country/AUS': { name: 'Australia', flag: '🇦🇺', iso: 'AUS' },
+    'country/BRA': { name: 'Brazil', flag: '🇧🇷', iso: 'BRA' },
+    'country/ITA': { name: 'Italy', flag: '🇮🇹', iso: 'ITA' },
+    'country/NLD': { name: 'Netherlands', flag: '🇳🇱', iso: 'NLD' },
+    'country/ESP': { name: 'Spain', flag: '🇪🇸', iso: 'ESP' },
+    'country/CHE': { name: 'Switzerland', flag: '🇨🇭', iso: 'CHE' },
+    'country/SWE': { name: 'Sweden', flag: '🇸🇪', iso: 'SWE' },
+    'country/SGP': { name: 'Singapore', flag: '🇸🇬', iso: 'SGP' },
+    'country/ISR': { name: 'Israel', flag: '🇮🇱', iso: 'ISR' },
+    'country/NOR': { name: 'Norway', flag: '🇳🇴', iso: 'NOR' },
+    'country/FIN': { name: 'Finland', flag: '🇫🇮', iso: 'FIN' },
+    'country/DNK': { name: 'Denmark', flag: '🇩🇰', iso: 'DNK' },
+    'country/TWN': { name: 'Taiwan', flag: '🇹🇼', iso: 'TWN' },
+    'country/SAU': { name: 'Saudi Arabia', flag: '🇸🇦', iso: 'SAU' },
+    'country/ARE': { name: 'UAE', flag: '🇦🇪', iso: 'ARE' },
+    'country/POL': { name: 'Poland', flag: '🇵🇱', iso: 'POL' },
+    'country/RUS': { name: 'Russia', flag: '🇷🇺', iso: 'RUS' },
+    'country/MEX': { name: 'Mexico', flag: '🇲🇽', iso: 'MEX' },
+    'country/IDN': { name: 'Indonesia', flag: '🇮🇩', iso: 'IDN' },
+    'country/TUR': { name: 'Turkey', flag: '🇹🇷', iso: 'TUR' },
+    'country/ZAF': { name: 'South Africa', flag: '🇿🇦', iso: 'ZAF' },
+    'country/NGA': { name: 'Nigeria', flag: '🇳🇬', iso: 'NGA' },
+    'country/KEN': { name: 'Kenya', flag: '🇰🇪', iso: 'KEN' },
+    'country/EGY': { name: 'Egypt', flag: '🇪🇬', iso: 'EGY' },
+    'country/GHA': { name: 'Ghana', flag: '🇬🇭', iso: 'GHA' },
+    'country/RWA': { name: 'Rwanda', flag: '🇷🇼', iso: 'RWA' },
+    'country/ETH': { name: 'Ethiopia', flag: '🇪🇹', iso: 'ETH' },
+    'country/THA': { name: 'Thailand', flag: '🇹🇭', iso: 'THA' },
+    'country/VNM': { name: 'Vietnam', flag: '🇻🇳', iso: 'VNM' },
+    'country/MYS': { name: 'Malaysia', flag: '🇲🇾', iso: 'MYS' },
+    'country/PHL': { name: 'Philippines', flag: '🇵🇭', iso: 'PHL' },
+    'country/CHL': { name: 'Chile', flag: '🇨🇱', iso: 'CHL' },
+    'country/COL': { name: 'Colombia', flag: '🇨🇴', iso: 'COL' },
+    'country/ARG': { name: 'Argentina', flag: '🇦🇷', iso: 'ARG' },
+    'country/IRL': { name: 'Ireland', flag: '🇮🇪', iso: 'IRL' },
+    'country/AUT': { name: 'Austria', flag: '🇦🇹', iso: 'AUT' },
+    'country/PRT': { name: 'Portugal', flag: '🇵🇹', iso: 'PRT' },
+    'country/CZE': { name: 'Czech Republic', flag: '🇨🇿', iso: 'CZE' },
+    'country/NZL': { name: 'New Zealand', flag: '🇳🇿', iso: 'NZL' },
+    'country/BGD': { name: 'Bangladesh', flag: '🇧🇩', iso: 'BGD' },
+    'country/PAK': { name: 'Pakistan', flag: '🇵🇰', iso: 'PAK' },
+};
+
+// ===== QUERY PARSING =====
+function parseQuery(q) {
+    q = q.toLowerCase();
+
+    const mentioned = [];
+    for (const [dcid, info] of Object.entries(COUNTRIES)) {
+        const nameLower = info.name.toLowerCase();
+        const isoLower = info.iso.toLowerCase();
+        if (q.includes(nameLower) || q.includes(isoLower)) {
+            mentioned.push(dcid);
+        }
+    }
+
+    let type = 'compare';
+    if (q.includes('top') || q.includes('rank') || q.includes('best') || q.includes('highest') || q.includes('leader')) type = 'ranking';
+    if (q.includes('divide') || q.includes('gap') || q.includes('inequal')) type = 'divide';
+    if (q.includes('africa')) type = 'africa';
+    if (q.includes('g7') || q.includes('g-7')) type = 'g7';
+    if (q.includes('g20') || q.includes('g-20')) type = 'g20';
+    if (q.includes('europe')) type = 'europe';
+    if (q.includes('asia') || q.includes('asean')) type = 'asia';
+    if (q.includes('ai research') || q.includes('ai paper') || q.includes('publication')) type = 'ai_research';
+    if (q.includes('data center') || q.includes('datacenter') || q.includes('infrastructure')) type = 'data_centers';
+    if (q.includes('gpu') || q.includes('cloud pric')) type = 'gpu_pricing';
+
+    let countries = mentioned;
+    if (countries.length > 0 && type === 'compare') {
+        // User specified countries — use them
+    } else if (type === 'ranking' && countries.length === 0) {
+        countries = ['country/USA','country/CHN','country/JPN','country/DEU','country/KOR',
+                     'country/GBR','country/FRA','country/CHE','country/FIN','country/SGP'];
+    } else if (type === 'g7') {
+        countries = ['country/USA','country/GBR','country/FRA','country/DEU','country/ITA','country/CAN','country/JPN'];
+    } else if (type === 'g20') {
+        countries = ['country/USA','country/CHN','country/JPN','country/DEU','country/GBR','country/FRA','country/IND',
+                     'country/ITA','country/BRA','country/CAN','country/KOR','country/AUS','country/MEX','country/IDN',
+                     'country/TUR','country/SAU','country/ARG','country/ZAF','country/RUS'];
+    } else if (type === 'africa') {
+        countries = ['country/ZAF','country/NGA','country/KEN','country/EGY','country/GHA','country/RWA','country/ETH'];
+    } else if (type === 'europe') {
+        countries = ['country/DEU','country/FRA','country/GBR','country/NLD','country/SWE','country/FIN','country/NOR','country/CHE'];
+    } else if (type === 'asia') {
+        countries = ['country/CHN','country/JPN','country/KOR','country/SGP','country/IND','country/THA','country/VNM','country/MYS','country/TWN'];
+    } else if (type === 'divide') {
+        countries = ['country/USA','country/CHE','country/SGP','country/NOR','country/NGA','country/BGD','country/ETH','country/PAK'];
+    } else if (type === 'ai_research') {
+        countries = ['country/CHN','country/USA','country/IND','country/GBR','country/DEU','country/KOR','country/JPN','country/FRA','country/CAN','country/ITA'];
+    } else if (type === 'data_centers') {
+        countries = ['country/USA','country/DEU','country/GBR','country/CHN','country/CAN','country/FRA','country/AUS','country/NLD','country/JPN','country/BRA'];
+    } else if (type === 'gpu_pricing') {
+        countries = ['country/IND','country/CHN','country/USA','country/TWN','country/ISR','country/CAN','country/SGP','country/GBR','country/DEU','country/JPN'];
+    } else if (countries.length === 0) {
+        countries = ['country/USA','country/CHN','country/IND','country/DEU','country/JPN'];
+    }
+
+    return { type, countries };
+}
+
+// ===== DATA COMMONS API =====
+async function fetchIndicator(varDcid, countryDcids) {
+    const params = new URLSearchParams({
+        key: DC_KEY,
+        date: 'LATEST',
+        'variable.dcids': varDcid,
+        select: ['entity','variable','value','date'],
+    });
+    countryDcids.forEach(c => params.append('entity.dcids', c));
+
+    const resp = await fetch(`${DC_API}?${params}`);
+    if (!resp.ok) throw new Error(`API error: ${resp.status}`);
+    const data = await resp.json();
+
+    const results = {};
+    const byEntity = data?.byVariable?.[varDcid]?.byEntity || {};
+    for (const [entity, info] of Object.entries(byEntity)) {
+        const obs = info?.orderedFacets?.[0]?.observations?.[0];
+        if (obs) results[entity] = { value: obs.value, date: obs.date };
+    }
+    return results;
+}
+
+async function fetchAllData(countryDcids) {
+    const results = {};
+    const fetches = Object.entries(INDICATORS).map(async ([key, ind]) => {
+        try {
+            results[key] = await fetchIndicator(ind.dcid, countryDcids);
+        } catch(e) {
+            console.warn(`Failed to fetch ${key}:`, e);
+            results[key] = {};
+        }
+    });
+    await Promise.all(fetches);
+    return results;
+}
+
+// ===== CPC SCORE CALCULATION =====
+function computeCPCScores(data, countries) {
+    const scores = {};
+    const raw = {};
+
+    for (const c of countries) {
+        const pop = data.population?.[c]?.value || 1;
+        const popM = pop / 1e6;
+        raw[c] = {
+            gdpPerCapita: data.gdpPerCapita?.[c]?.value || 0,
+            internetUsers: data.internetUsers?.[c]?.value || 0,
+            broadband: data.broadband?.[c]?.value || 0,
+            electricityPerCapita: (data.electricity?.[c]?.value || 0) / pop,
+            rdSpending: data.rdSpending?.[c]?.value || 0,
+            superTflopsPerM: (TOP500_TFLOPS[c] || 0) / popM,
+            dataCentersPerM: (DATA_CENTERS[c] || 0) / popM,
+            aiPubsPerM: (AI_PUBLICATIONS[c] || 0) / popM,
+            gpuCostPerHr: GPU_PRICING[c] || null,
+            // Absolute values for display
+            superTflops: TOP500_TFLOPS[c] || 0,
+            dataCenters: DATA_CENTERS[c] || 0,
+            aiPubs: AI_PUBLICATIONS[c] || 0,
+            population: pop,
+        };
+    }
+
+    // Normalize 0-100
+    const normKeys = ['gdpPerCapita','internetUsers','broadband','electricityPerCapita','rdSpending',
+                      'superTflopsPerM','dataCentersPerM','aiPubsPerM'];
+    const mins = {}, maxs = {};
+    for (const k of normKeys) {
+        const vals = countries.map(c => raw[c][k]).filter(v => v > 0);
+        mins[k] = Math.min(...(vals.length ? vals : [0]));
+        maxs[k] = Math.max(...(vals.length ? vals : [1]));
+    }
+
+    // GPU cost is inverse — lower is better
+    const gpuVals = countries.map(c => raw[c].gpuCostPerHr).filter(v => v > 0);
+    const gpuMin = Math.min(...(gpuVals.length ? gpuVals : [1]));
+    const gpuMax = Math.max(...(gpuVals.length ? gpuVals : [5]));
+
+    // Weights for CPC score (total = 1.0)
+    const weights = {
+        gdpPerCapita: 0.05, internetUsers: 0.10, broadband: 0.12, electricityPerCapita: 0.08,
+        rdSpending: 0.15, superTflopsPerM: 0.18, dataCentersPerM: 0.12, aiPubsPerM: 0.12,
+        gpuAccess: 0.08,
+    };
+
+    for (const c of countries) {
+        let score = 0;
+        for (const k of normKeys) {
+            const norm = maxs[k] > mins[k] ? (raw[c][k] - mins[k]) / (maxs[k] - mins[k]) : 0;
+            score += norm * (weights[k] || 0) * 100;
+        }
+        // GPU: inverse normalize (cheaper = better)
+        if (raw[c].gpuCostPerHr && gpuMax > gpuMin) {
+            const gpuNorm = 1 - (raw[c].gpuCostPerHr - gpuMin) / (gpuMax - gpuMin);
+            score += gpuNorm * weights.gpuAccess * 100;
+        }
+
+        scores[c] = {
+            cpcScore: Math.round(score * 10) / 10,
+            raw: raw[c],
+        };
+    }
+    return scores;
+}
+
+// ===== FORMATTING HELPERS =====
+function fmt(n, decimals = 0) {
+    if (!n && n !== 0) return '—';
+    if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M';
+    if (n >= 1e3) return (n / 1e3).toFixed(decimals > 0 ? decimals : 0) + (n >= 10000 ? 'K' : '');
+    return n.toFixed(decimals).toLocaleString();
+}
+
+// ===== RENDERING =====
+function renderResults(query, scores, countries) {
+    const sorted = [...countries].sort((a, b) => (scores[b]?.cpcScore || 0) - (scores[a]?.cpcScore || 0));
+    const resultsDiv = document.getElementById('results');
+    const chartId = 'chart-' + Date.now();
+    const radarId = 'radar-' + Date.now();
+    const dcChartId = 'dc-chart-' + Date.now();
+    const aiChartId = 'ai-chart-' + Date.now();
+
+    // Table rows
+    const tableRows = sorted.map((c, i) => {
+        const s = scores[c];
+        const info = COUNTRIES[c] || { name: c, flag: '' };
+        const sc = s.cpcScore >= 60 ? 'score-high' : s.cpcScore >= 30 ? 'score-mid' : 'score-low';
+        return `<tr>
+            <td>${i + 1}</td>
+            <td>${info.flag} ${info.name}</td>
+            <td><span class="score-badge ${sc}">${s.cpcScore}</span></td>
+            <td>${s.raw.gdpPerCapita ? '$' + fmt(s.raw.gdpPerCapita) : '—'}</td>
+            <td>${s.raw.internetUsers ? s.raw.internetUsers.toFixed(0) + '%' : '—'}</td>
+            <td>${s.raw.broadband ? s.raw.broadband.toFixed(1) : '—'}</td>
+            <td>${s.raw.rdSpending ? s.raw.rdSpending.toFixed(1) + '%' : '—'}</td>
+            <td>${s.raw.superTflops ? fmt(s.raw.superTflops) : '—'}</td>
+            <td>${s.raw.dataCenters || '—'}</td>
+            <td>${s.raw.aiPubs ? fmt(s.raw.aiPubs) : '—'}</td>
+            <td>${s.raw.gpuCostPerHr ? '$' + s.raw.gpuCostPerHr.toFixed(2) : '—'}</td>
+        </tr>`;
+    }).join('');
+
+    // Insight text
+    const top = sorted[0], bottom = sorted[sorted.length - 1];
+    const ti = COUNTRIES[top] || { name: top }, bi = COUNTRIES[bottom] || { name: bottom };
+    const ts = scores[top]?.cpcScore || 0, bs = scores[bottom]?.cpcScore || 0;
+    let insight = `<strong>${ti.flag || ''} ${ti.name}</strong> leads with a CPC score of <strong>${ts}</strong>`;
+    if (sorted.length > 1) insight += `, while <strong>${bi.flag || ''} ${bi.name}</strong> scores <strong>${bs}</strong> — a ${(ts - bs).toFixed(1)}-point gap`;
+    insight += '. ';
+
+    const tr = scores[top]?.raw || {};
+    if (tr.superTflops > 1000000) insight += `Dominant supercomputing capacity (${fmt(tr.superTflops)} TFLOPS) is a key driver. `;
+    if (tr.dataCenters > 500) insight += `Massive data center footprint (${tr.dataCenters} facilities). `;
+    if (tr.rdSpending > 3) insight += `Strong R&D investment at ${tr.rdSpending.toFixed(1)}% of GDP. `;
+    if (tr.aiPubs > 20000) insight += `Produces ${fmt(tr.aiPubs)} AI research papers annually. `;
+
+    resultsDiv.innerHTML = `
+        <div class="result-card">
+            <h3>📊 Compute Readiness Index — ${sorted.slice(0, 5).map(c => (COUNTRIES[c]?.flag || '') + ' ' + (COUNTRIES[c]?.name || c)).join(' vs ')}${sorted.length > 5 ? ' + ' + (sorted.length - 5) + ' more' : ''}</h3>
+            <div class="chart-container">
+                <canvas id="${chartId}"></canvas>
+            </div>
+            <div class="insight-text">${insight}</div>
+            <span class="source-tag">Sources: World Bank · UN SDG · UN Energy · TOP500 (Nov 2024) · Cargoson · Stanford HAI AI Index 2025 · GetDeploying</span>
+        </div>
+        <div class="chart-row">
+            <div class="mini-chart">
+                <h4>🏢 Data Centers by Country</h4>
+                <div class="mini-chart-container"><canvas id="${dcChartId}"></canvas></div>
+            </div>
+            <div class="mini-chart">
+                <h4>🧠 AI Research Output (papers/year)</h4>
+                <div class="mini-chart-container"><canvas id="${aiChartId}"></canvas></div>
+            </div>
+        </div>
+        <div class="result-card">
+            <h3>📋 Full Indicator Breakdown</h3>
+            <div style="overflow-x:auto">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>#</th><th>Country</th><th>CPC</th><th>GDP/Cap</th><th>Net %</th><th>BB/100</th>
+                            <th>R&D%</th><th>TFLOPS</th><th>DCs</th><th>AI Pubs</th><th>GPU $/hr</th>
+                        </tr>
+                    </thead>
+                    <tbody>${tableRows}</tbody>
+                </table>
+            </div>
+            <span class="source-tag">CPC = Weighted: Supercompute/cap 18% · R&D 15% · Broadband 12% · Data Centers/cap 12% · AI Pubs/cap 12% · Internet 10% · GPU Access 8% · Electricity/cap 8% · GDP/cap 5%</span>
+        </div>
+    `;
+
+    // Main bar chart
+    const ctx = document.getElementById(chartId).getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: sorted.map(c => (COUNTRIES[c]?.flag || '') + ' ' + (COUNTRIES[c]?.name || c)),
+            datasets: [{
+                label: 'CPC Score',
+                data: sorted.map(c => scores[c]?.cpcScore || 0),
+                backgroundColor: sorted.map(c => {
+                    const s = scores[c]?.cpcScore || 0;
+                    return s >= 60 ? 'rgba(34,197,94,0.7)' : s >= 30 ? 'rgba(245,158,11,0.7)' : 'rgba(239,68,68,0.7)';
+                }),
+                borderColor: sorted.map(c => {
+                    const s = scores[c]?.cpcScore || 0;
+                    return s >= 60 ? '#22c55e' : s >= 30 ? '#f59e0b' : '#ef4444';
+                }),
+                borderWidth: 1,
+                borderRadius: 6,
+            }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false }, tooltip: { backgroundColor: '#1a2235', titleColor: '#e2e8f0', bodyColor: '#8892a8', borderColor: '#2a3550', borderWidth: 1 } },
+            scales: {
+                y: { beginAtZero: true, max: 100, grid: { color: 'rgba(42,53,80,0.5)' }, ticks: { color: '#8892a8' }, title: { display: true, text: 'CPC Score (0-100)', color: '#8892a8' } },
+                x: { grid: { display: false }, ticks: { color: '#8892a8', maxRotation: 45 } }
+            }
+        }
+    });
+
+    // Data Centers mini chart
+    const dcCtx = document.getElementById(dcChartId).getContext('2d');
+    const dcSorted = [...sorted].sort((a,b) => (scores[b]?.raw.dataCenters || 0) - (scores[a]?.raw.dataCenters || 0));
+    new Chart(dcCtx, {
+        type: 'bar',
+        data: {
+            labels: dcSorted.map(c => (COUNTRIES[c]?.flag || '') + ' ' + (COUNTRIES[c]?.name || c)),
+            datasets: [{ data: dcSorted.map(c => scores[c]?.raw.dataCenters || 0), backgroundColor: 'rgba(168,85,247,0.6)', borderColor: '#a855f7', borderWidth: 1, borderRadius: 4 }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false, indexAxis: 'y',
+            plugins: { legend: { display: false } },
+            scales: { x: { grid: { color: 'rgba(42,53,80,0.3)' }, ticks: { color: '#8892a8' } }, y: { grid: { display: false }, ticks: { color: '#8892a8', font: { size: 10 } } } }
+        }
+    });
+
+    // AI Publications mini chart
+    const aiCtx = document.getElementById(aiChartId).getContext('2d');
+    const aiSorted = [...sorted].sort((a,b) => (scores[b]?.raw.aiPubs || 0) - (scores[a]?.raw.aiPubs || 0));
+    new Chart(aiCtx, {
+        type: 'bar',
+        data: {
+            labels: aiSorted.map(c => (COUNTRIES[c]?.flag || '') + ' ' + (COUNTRIES[c]?.name || c)),
+            datasets: [{ data: aiSorted.map(c => scores[c]?.raw.aiPubs || 0), backgroundColor: 'rgba(59,130,246,0.6)', borderColor: '#3b82f6', borderWidth: 1, borderRadius: 4 }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false, indexAxis: 'y',
+            plugins: { legend: { display: false } },
+            scales: { x: { grid: { color: 'rgba(42,53,80,0.3)' }, ticks: { color: '#8892a8' } }, y: { grid: { display: false }, ticks: { color: '#8892a8', font: { size: 10 } } } }
+        }
+    });
+}
+
+// ===== MAIN =====
+async function handleQuery() {
+    const input = document.getElementById('query');
+    const btn = document.getElementById('askBtn');
+    const resultsDiv = document.getElementById('results');
+    const q = input.value.trim();
+    if (!q) return;
+
+    btn.disabled = true;
+    btn.textContent = '...';
+    resultsDiv.innerHTML = '<div class="loading"><div class="spinner"></div><br>Querying Google Data Commons + 4 supplemental datasets...</div>';
+
+    try {
+        const { type, countries } = parseQuery(q);
+        const data = await fetchAllData(countries);
+        const scores = computeCPCScores(data, countries);
+        renderResults(q, scores, countries);
+    } catch(e) {
+        resultsDiv.innerHTML = `<div class="error-msg">Something went wrong: ${e.message}. Please try again.</div>`;
+        console.error(e);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Ask';
+    }
+}
+
+function runQuery(q) {
+    document.getElementById('query').value = q;
+    handleQuery();
+}
+
+document.getElementById('query').addEventListener('keydown', e => {
+    if (e.key === 'Enter') handleQuery();
+});
+</script>
+
+</body>
+</html>

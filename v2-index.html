@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compute Per Capita — The New GDP for the AI Era</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #080b12;
+            --surface: #0f1420;
+            --surface-2: #151c2c;
+            --surface-3: #1a2236;
+            --border: #1e2a42;
+            --border-light: #2a3a58;
+            --text: #e8ecf4;
+            --text-dim: #7b8baa;
+            --text-muted: #4a5a78;
+            --accent: #818cf8;
+            --accent-soft: rgba(129, 140, 248, 0.12);
+            --mint: #6ee7b7;
+            --mint-soft: rgba(110, 231, 183, 0.12);
+            --gold: #fbbf24;
+            --gold-soft: rgba(251, 191, 36, 0.10);
+            --coral: #f87171;
+            --coral-soft: rgba(248, 113, 113, 0.10);
+            --lavender: #c4b5fd;
+            --rose: #fda4af;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ===== HERO ===== */
+        .hero {
+            min-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem 1.5rem;
+            position: relative;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 120px;
+            background: linear-gradient(transparent, var(--bg));
+            pointer-events: none;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 1rem;
+            border-radius: 100px;
+            background: var(--accent-soft);
+            border: 1px solid rgba(129, 140, 248, 0.2);
+            color: var(--accent);
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.04em;
+            margin-bottom: 2rem;
+        }
+
+        .hero h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+            margin-bottom: 1.25rem;
+            background: linear-gradient(135deg, #e8ecf4 0%, #818cf8 50%, #6ee7b7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            color: var(--text-dim);
+            font-size: clamp(1rem, 2vw, 1.2rem);
+            max-width: 520px;
+            line-height: 1.6;
+            font-weight: 300;
+            margin-bottom: 2.5rem;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 2.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .hero-stat {
+            text-align: center;
+        }
+
+        .hero-stat .num {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text);
+            display: block;
+        }
+
+        .hero-stat .label {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        /* ===== QUERY ===== */
+        .query-section {
+            max-width: 640px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 1.5rem 1.5rem;
+        }
+
+        .input-wrap {
+            display: flex;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .input-wrap:focus-within {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px var(--accent-soft), 0 8px 32px rgba(0,0,0,0.3);
+        }
+
+        .query-section input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 1.1rem 1.5rem;
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 300;
+            outline: none;
+        }
+
+        .query-section input::placeholder { color: var(--text-muted); }
+
+        .query-section button {
+            background: var(--accent);
+            border: none;
+            padding: 0 2rem;
+            color: #080b12;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            letter-spacing: 0.02em;
+        }
+
+        .query-section button:hover { background: #a5b4fc; }
+        .query-section button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        .suggestions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            justify-content: center;
+            padding: 1rem 1.5rem 0;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .suggestions button {
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            padding: 0.45rem 0.9rem;
+            color: var(--text-muted);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.72rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 400;
+        }
+
+        .suggestions button:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: var(--accent-soft);
+        }
+
+        /* ===== RESULTS ===== */
+        .results {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 3rem 1.5rem 4rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-muted);
+            font-weight: 300;
+        }
+
+        .loading .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ===== INSIGHT HERO ===== */
+        .insight-hero {
+            text-align: center;
+            padding: 2rem 0 3rem;
+        }
+
+        .insight-hero h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 0.75rem;
+            letter-spacing: -0.01em;
+        }
+
+        .insight-hero p {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            line-height: 1.7;
+            max-width: 560px;
+            margin: 0 auto;
+            font-weight: 300;
+        }
+
+        .insight-hero p strong { color: var(--text); font-weight: 500; }
+
+        /* ===== BUBBLE CHART ===== */
+        .chart-section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-section .section-label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-bottom: 1.25rem;
+            font-weight: 500;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+        }
+
+        /* ===== COUNTRY CARDS ===== */
+        .cards-section {
+            margin-bottom: 2rem;
+        }
+
+        .cards-section .section-label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .country-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.25rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .country-card:hover {
+            border-color: var(--border-light);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+
+        .country-card.expanded .card-details { display: block; }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .card-country {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .card-flag {
+            font-size: 1.5rem;
+            line-height: 1;
+        }
+
+        .card-name {
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: var(--text);
+        }
+
+        .card-rank {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .card-score {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+        }
+
+        .card-score.high { color: var(--mint); }
+        .card-score.mid { color: var(--gold); }
+        .card-score.low { color: var(--coral); }
+
+        /* Radar chart in card */
+        .card-radar {
+            height: 140px;
+            margin: 0 -0.5rem;
+        }
+
+        .card-details {
+            display: none;
+            border-top: 1px solid var(--border);
+            margin-top: 1rem;
+            padding-top: 1rem;
+        }
+
+        .card-detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.3rem 0;
+            font-size: 0.75rem;
+        }
+
+        .card-detail-row .label { color: var(--text-muted); }
+        .card-detail-row .value { color: var(--text-dim); font-weight: 500; }
+
+        /* ===== MINI CHARTS ROW ===== */
+        .mini-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+        }
+
+        .mini-panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+
+        .mini-panel .section-label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        .mini-chart-container {
+            height: 220px;
+        }
+
+        /* ===== SOURCE FOOTER ===== */
+        .sources {
+            text-align: center;
+            padding: 1rem;
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            letter-spacing: 0.02em;
+        }
+
+        footer {
+            text-align: center;
+            padding: 3rem 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        footer p {
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            line-height: 1.8;
+        }
+
+        footer a { color: var(--accent); text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+
+        .error-msg {
+            text-align: center;
+            padding: 3rem;
+            color: var(--coral);
+            font-weight: 300;
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-in {
+            animation: fadeUp 0.5s ease forwards;
+            opacity: 0;
+        }
+
+        .animate-in:nth-child(2) { animation-delay: 0.1s; }
+        .animate-in:nth-child(3) { animation-delay: 0.2s; }
+        .animate-in:nth-child(4) { animation-delay: 0.3s; }
+
+        /* ===== COUNTER ANIMATION ===== */
+        .counter { display: inline-block; }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 700px) {
+            .hero { min-height: 75vh; padding: 1.5rem; }
+            .hero-stats { gap: 1.5rem; }
+            .hero-stat .num { font-size: 1.3rem; }
+            .chart-container { height: 300px; }
+            .mini-row { grid-template-columns: 1fr; }
+            .mini-chart-container { height: 180px; }
+            .cards-grid { grid-template-columns: 1fr; }
+            .results { padding: 2rem 1rem 3rem; }
+            .chart-section { padding: 1.25rem; border-radius: 14px; }
+            .country-card { border-radius: 14px; }
+        }
+
+        @media (max-width: 400px) {
+            .hero h1 { font-size: 2rem; }
+            .suggestions button { font-size: 0.65rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+    <div class="hero-badge">✦ Open Data Platform</div>
+    <h1>Compute Per Capita</h1>
+    <p>Measuring national AI readiness through compute power, infrastructure, and investment per person.</p>
+    <div class="hero-stats">
+        <div class="hero-stat"><span class="num counter" data-target="50">0</span><span class="label">Countries</span></div>
+        <div class="hero-stat"><span class="num counter" data-target="9">0</span><span class="label">Indicators</span></div>
+        <div class="hero-stat"><span class="num counter" data-target="10700">0</span><span class="label">Data Points</span></div>
+    </div>
+    <div class="query-section">
+        <div class="input-wrap">
+            <input type="text" id="query" placeholder="Compare countries, explore the digital divide…" autofocus>
+            <button id="askBtn" onclick="handleQuery()">Explore</button>
+        </div>
+    </div>
+    <div class="suggestions">
+        <button onclick="runQuery('Compare US vs China vs India')">US vs China vs India</button>
+        <button onclick="runQuery('Show the top 10 countries by compute readiness')">Top 10 Rankings</button>
+        <button onclick="runQuery('Compare G7 nations')">G7 Nations</button>
+        <button onclick="runQuery('Which African countries have the highest compute readiness?')">Africa Leaders</button>
+        <button onclick="runQuery('Show the digital divide: richest vs poorest countries')">Digital Divide</button>
+        <button onclick="runQuery('Show AI research leaders')">AI Research</button>
+        <button onclick="runQuery('Compare data center infrastructure')">Data Centers</button>
+    </div>
+</section>
+
+<!-- ===== RESULTS ===== -->
+<section class="results" id="results"></section>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+    <p>
+        Data: <a href="https://datacommons.org" target="_blank">Google Data Commons</a> ·
+        <a href="https://top500.org" target="_blank">TOP500</a> ·
+        <a href="https://hai.stanford.edu/ai-index/2025-ai-index-report" target="_blank">Stanford HAI</a> ·
+        <a href="https://www.cargoson.com/en/blog/number-of-data-centers-by-country" target="_blank">DataCenterMap</a> ·
+        <a href="https://getdeploying.com/gpus" target="_blank">GetDeploying</a><br>
+        &copy; 2026 Compute Per Capita · Open data for an equitable AI future
+    </p>
+</footer>
+
+<script>
+// ===== ANIMATED COUNTERS =====
+function animateCounters() {
+    document.querySelectorAll('.counter').forEach(el => {
+        const target = parseInt(el.dataset.target);
+        const duration = 1500;
+        const start = performance.now();
+        const format = target >= 1000;
+        function tick(now) {
+            const elapsed = now - start;
+            const progress = Math.min(elapsed / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            const current = Math.round(eased * target);
+            el.textContent = format ? current.toLocaleString() + '+' : current + '+';
+            if (progress < 1) requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+    });
+}
+setTimeout(animateCounters, 300);
+
+// ===== CONFIG =====
+const DC_API = 'https://api.datacommons.org/v2/observation';
+const DC_KEY = 'AIzaSyCTI4Xz-UW_G2Q2RfknhcfdAnTHq5X5XuI';
+
+const INDICATORS = {
+    gdpPerCapita:  { dcid: 'worldBank/NY_GDP_PCAP_KD' },
+    internetUsers: { dcid: 'Count_Person_IsInternetUser_PerCapita' },
+    broadband:     { dcid: 'sdg/IT_NET_BBND' },
+    electricity:   { dcid: 'Annual_Consumption_Electricity' },
+    rdSpending:    { dcid: 'sdg/GB_XPD_RSDV' },
+    population:    { dcid: 'Count_Person' },
+};
+
+// TOP500 (Nov 2024)
+const TOP500 = {
+    'country/USA':6475559,'country/JPN':940710,'country/ITA':837788,'country/CHE':473517,
+    'country/DEU':405341,'country/FIN':391388,'country/CHN':319062,'country/FRA':298086,
+    'country/ESP':221873,'country/KOR':213091,'country/TWN':103541,'country/NLD':98364,
+    'country/SAU':96036,'country/GBR':84814,'country/RUS':71457,'country/CAN':45000,
+    'country/AUS':40000,'country/BRA':35000,'country/IND':32000,'country/SGP':28000,
+    'country/POL':25000,'country/SWE':22000,'country/ISR':18000,'country/NOR':12000,
+};
+
+// Data Centers (Nov 2025)
+const DCS = {
+    'country/USA':5427,'country/DEU':529,'country/GBR':523,'country/CHN':449,
+    'country/CAN':337,'country/FRA':322,'country/AUS':314,'country/NLD':298,
+    'country/RUS':251,'country/JPN':222,'country/BRA':197,'country/MEX':173,
+    'country/ITA':168,'country/IND':153,'country/POL':144,'country/ESP':144,
+    'country/CHE':121,'country/SGP':99,'country/SWE':95,'country/IDN':88,
+    'country/NZL':83,'country/AUT':68,'country/MYS':62,'country/CHL':59,
+    'country/IRL':55,'country/DNK':50,'country/FIN':48,'country/NOR':47,
+    'country/KOR':43,'country/THA':42,'country/COL':41,'country/PHL':39,
+    'country/TUR':35,'country/CZE':34,'country/VNM':33,'country/ISR':30,
+    'country/ARG':29,'country/SAU':25,'country/ZAF':22,'country/PRT':21,
+    'country/ARE':20,'country/TWN':19,'country/NGA':12,'country/PAK':11,
+    'country/KEN':10,'country/EGY':8,'country/BGD':7,'country/GHA':5,
+    'country/RWA':3,'country/ETH':2,
+};
+
+// AI Papers (2023, Stanford HAI)
+const AIPUB = {
+    'country/CHN':60000,'country/USA':28000,'country/IND':17000,'country/GBR':8500,
+    'country/DEU':7200,'country/KOR':6800,'country/JPN':5500,'country/FRA':5000,
+    'country/CAN':4800,'country/ITA':4200,'country/AUS':3800,'country/ESP':3500,
+    'country/BRA':3200,'country/NLD':2800,'country/RUS':2500,'country/TWN':2200,
+    'country/SGP':2000,'country/CHE':1900,'country/SWE':1600,'country/POL':1500,
+    'country/ISR':1400,'country/TUR':1300,'country/FIN':900,'country/NOR':850,
+    'country/DNK':800,'country/AUT':750,'country/CZE':600,'country/IRL':580,
+    'country/NZL':500,'country/SAU':500,'country/PRT':480,'country/MYS':450,
+    'country/MEX':400,'country/IDN':400,'country/THA':380,'country/PAK':350,
+    'country/ZAF':350,'country/ARE':350,'country/EGY':300,'country/CHL':300,
+    'country/ARG':280,'country/COL':250,'country/VNM':250,'country/PHL':200,
+    'country/NGA':180,'country/BGD':150,'country/GHA':80,'country/ETH':60,
+    'country/RWA':40,
+};
+
+// GPU $/hr H100 avg (2025)
+const GPU = {
+    'country/USA':2.50,'country/CAN':2.85,'country/GBR':3.10,'country/DEU':3.20,
+    'country/FRA':3.15,'country/NLD':3.05,'country/JPN':3.40,'country/KOR':3.30,
+    'country/SGP':2.90,'country/AUS':3.50,'country/IND':1.80,'country/CHN':2.00,
+    'country/BRA':3.80,'country/SAU':3.60,'country/ARE':3.50,'country/SWE':3.10,
+    'country/FIN':3.20,'country/NOR':3.30,'country/CHE':3.40,'country/ITA':3.25,
+    'country/ESP':3.20,'country/ISR':2.70,'country/TWN':2.60,'country/POL':2.80,
+    'country/CZE':2.90,'country/IRL':3.00,'country/AUT':3.15,
+};
+
+// Countries
+const C = {
+    'country/USA':{n:'United States',f:'🇺🇸',i:'USA'},'country/CHN':{n:'China',f:'🇨🇳',i:'CHN'},
+    'country/IND':{n:'India',f:'🇮🇳',i:'IND'},'country/DEU':{n:'Germany',f:'🇩🇪',i:'DEU'},
+    'country/JPN':{n:'Japan',f:'🇯🇵',i:'JPN'},'country/GBR':{n:'United Kingdom',f:'🇬🇧',i:'GBR'},
+    'country/FRA':{n:'France',f:'🇫🇷',i:'FRA'},'country/KOR':{n:'South Korea',f:'🇰🇷',i:'KOR'},
+    'country/CAN':{n:'Canada',f:'🇨🇦',i:'CAN'},'country/AUS':{n:'Australia',f:'🇦🇺',i:'AUS'},
+    'country/BRA':{n:'Brazil',f:'🇧🇷',i:'BRA'},'country/ITA':{n:'Italy',f:'🇮🇹',i:'ITA'},
+    'country/NLD':{n:'Netherlands',f:'🇳🇱',i:'NLD'},'country/ESP':{n:'Spain',f:'🇪🇸',i:'ESP'},
+    'country/CHE':{n:'Switzerland',f:'🇨🇭',i:'CHE'},'country/SWE':{n:'Sweden',f:'🇸🇪',i:'SWE'},
+    'country/SGP':{n:'Singapore',f:'🇸🇬',i:'SGP'},'country/ISR':{n:'Israel',f:'🇮🇱',i:'ISR'},
+    'country/NOR':{n:'Norway',f:'🇳🇴',i:'NOR'},'country/FIN':{n:'Finland',f:'🇫🇮',i:'FIN'},
+    'country/DNK':{n:'Denmark',f:'🇩🇰',i:'DNK'},'country/TWN':{n:'Taiwan',f:'🇹🇼',i:'TWN'},
+    'country/SAU':{n:'Saudi Arabia',f:'🇸🇦',i:'SAU'},'country/ARE':{n:'UAE',f:'🇦🇪',i:'ARE'},
+    'country/POL':{n:'Poland',f:'🇵🇱',i:'POL'},'country/RUS':{n:'Russia',f:'🇷🇺',i:'RUS'},
+    'country/MEX':{n:'Mexico',f:'🇲🇽',i:'MEX'},'country/IDN':{n:'Indonesia',f:'🇮🇩',i:'IDN'},
+    'country/TUR':{n:'Turkey',f:'🇹🇷',i:'TUR'},'country/ZAF':{n:'South Africa',f:'🇿🇦',i:'ZAF'},
+    'country/NGA':{n:'Nigeria',f:'🇳🇬',i:'NGA'},'country/KEN':{n:'Kenya',f:'🇰🇪',i:'KEN'},
+    'country/EGY':{n:'Egypt',f:'🇪🇬',i:'EGY'},'country/GHA':{n:'Ghana',f:'🇬🇭',i:'GHA'},
+    'country/RWA':{n:'Rwanda',f:'🇷🇼',i:'RWA'},'country/ETH':{n:'Ethiopia',f:'🇪🇹',i:'ETH'},
+    'country/THA':{n:'Thailand',f:'🇹🇭',i:'THA'},'country/VNM':{n:'Vietnam',f:'🇻🇳',i:'VNM'},
+    'country/MYS':{n:'Malaysia',f:'🇲🇾',i:'MYS'},'country/PHL':{n:'Philippines',f:'🇵🇭',i:'PHL'},
+    'country/CHL':{n:'Chile',f:'🇨🇱',i:'CHL'},'country/COL':{n:'Colombia',f:'🇨🇴',i:'COL'},
+    'country/ARG':{n:'Argentina',f:'🇦🇷',i:'ARG'},'country/IRL':{n:'Ireland',f:'🇮🇪',i:'IRL'},
+    'country/AUT':{n:'Austria',f:'🇦🇹',i:'AUT'},'country/PRT':{n:'Portugal',f:'🇵🇹',i:'PRT'},
+    'country/CZE':{n:'Czech Republic',f:'🇨🇿',i:'CZE'},'country/NZL':{n:'New Zealand',f:'🇳🇿',i:'NZL'},
+    'country/BGD':{n:'Bangladesh',f:'🇧🇩',i:'BGD'},'country/PAK':{n:'Pakistan',f:'🇵🇰',i:'PAK'},
+};
+
+// ===== QUERY PARSING =====
+function parseQuery(q) {
+    q = q.toLowerCase();
+    const mentioned = [];
+    for (const [dcid, info] of Object.entries(C)) {
+        if (q.includes(info.n.toLowerCase()) || q.includes(info.i.toLowerCase())) mentioned.push(dcid);
+    }
+    let type = 'compare';
+    if (q.match(/top|rank|best|highest|leader/)) type = 'ranking';
+    if (q.match(/divide|gap|inequal/)) type = 'divide';
+    if (q.includes('africa')) type = 'africa';
+    if (q.match(/g7|g-7/)) type = 'g7';
+    if (q.match(/g20|g-20/)) type = 'g20';
+    if (q.includes('europe')) type = 'europe';
+    if (q.match(/asia|asean/)) type = 'asia';
+    if (q.match(/ai research|ai paper|publication/)) type = 'ai_research';
+    if (q.match(/data center|datacenter|infrastructure/)) type = 'data_centers';
+
+    let countries = mentioned;
+    const presets = {
+        ranking: ['country/USA','country/CHN','country/JPN','country/DEU','country/KOR','country/GBR','country/FRA','country/CHE','country/FIN','country/SGP'],
+        g7: ['country/USA','country/GBR','country/FRA','country/DEU','country/ITA','country/CAN','country/JPN'],
+        g20: ['country/USA','country/CHN','country/JPN','country/DEU','country/GBR','country/FRA','country/IND','country/ITA','country/BRA','country/CAN','country/KOR','country/AUS','country/MEX','country/IDN','country/TUR','country/SAU','country/ARG','country/ZAF','country/RUS'],
+        africa: ['country/ZAF','country/NGA','country/KEN','country/EGY','country/GHA','country/RWA','country/ETH'],
+        europe: ['country/DEU','country/FRA','country/GBR','country/NLD','country/SWE','country/FIN','country/NOR','country/CHE'],
+        asia: ['country/CHN','country/JPN','country/KOR','country/SGP','country/IND','country/THA','country/VNM','country/MYS','country/TWN'],
+        divide: ['country/USA','country/CHE','country/SGP','country/NOR','country/NGA','country/BGD','country/ETH','country/PAK'],
+        ai_research: ['country/CHN','country/USA','country/IND','country/GBR','country/DEU','country/KOR','country/JPN','country/FRA','country/CAN','country/ITA'],
+        data_centers: ['country/USA','country/DEU','country/GBR','country/CHN','country/CAN','country/FRA','country/AUS','country/NLD','country/JPN','country/BRA'],
+    };
+    if (countries.length === 0 || (type !== 'compare' && countries.length === 0)) {
+        countries = presets[type] || ['country/USA','country/CHN','country/IND','country/DEU','country/JPN'];
+    }
+    return { type, countries };
+}
+
+// ===== API =====
+async function fetchIndicator(varDcid, ids) {
+    const params = new URLSearchParams({ key: DC_KEY, date: 'LATEST', 'variable.dcids': varDcid, select: ['entity','variable','value','date'] });
+    ids.forEach(c => params.append('entity.dcids', c));
+    const r = await fetch(`${DC_API}?${params}`);
+    if (!r.ok) throw new Error(`API ${r.status}`);
+    const d = await r.json();
+    const out = {};
+    const by = d?.byVariable?.[varDcid]?.byEntity || {};
+    for (const [e, info] of Object.entries(by)) {
+        const o = info?.orderedFacets?.[0]?.observations?.[0];
+        if (o) out[e] = { value: o.value, date: o.date };
+    }
+    return out;
+}
+
+async function fetchAll(ids) {
+    const r = {};
+    await Promise.all(Object.entries(INDICATORS).map(async ([k, v]) => {
+        try { r[k] = await fetchIndicator(v.dcid, ids); } catch(e) { r[k] = {}; }
+    }));
+    return r;
+}
+
+// ===== SCORING =====
+function score(data, countries) {
+    const raw = {};
+    for (const c of countries) {
+        const pop = data.population?.[c]?.value || 1;
+        const pM = pop / 1e6;
+        raw[c] = {
+            gdp: data.gdpPerCapita?.[c]?.value || 0,
+            net: data.internetUsers?.[c]?.value || 0,
+            bb: data.broadband?.[c]?.value || 0,
+            elec: (data.electricity?.[c]?.value || 0) / pop,
+            rd: data.rdSpending?.[c]?.value || 0,
+            sc: (TOP500[c] || 0) / pM,
+            dc: (DCS[c] || 0) / pM,
+            ai: (AIPUB[c] || 0) / pM,
+            gpu: GPU[c] || null,
+            _sc: TOP500[c] || 0, _dc: DCS[c] || 0, _ai: AIPUB[c] || 0, _pop: pop,
+        };
+    }
+    const nk = ['gdp','net','bb','elec','rd','sc','dc','ai'];
+    const mn = {}, mx = {};
+    for (const k of nk) {
+        const v = countries.map(c => raw[c][k]).filter(v => v > 0);
+        mn[k] = v.length ? Math.min(...v) : 0;
+        mx[k] = v.length ? Math.max(...v) : 1;
+    }
+    const gv = countries.map(c => raw[c].gpu).filter(v => v > 0);
+    const gMin = gv.length ? Math.min(...gv) : 1, gMax = gv.length ? Math.max(...gv) : 5;
+
+    const w = { gdp:.05, net:.10, bb:.12, elec:.08, rd:.15, sc:.18, dc:.12, ai:.12, gpu:.08 };
+    const scores = {};
+    for (const c of countries) {
+        let s = 0;
+        for (const k of nk) {
+            const n = mx[k] > mn[k] ? (raw[c][k] - mn[k]) / (mx[k] - mn[k]) : 0;
+            s += n * (w[k] || 0) * 100;
+        }
+        if (raw[c].gpu && gMax > gMin) s += (1 - (raw[c].gpu - gMin) / (gMax - gMin)) * w.gpu * 100;
+
+        // Per-indicator normalized (0-1) for radar chart
+        const norm = {};
+        for (const k of nk) norm[k] = mx[k] > mn[k] ? (raw[c][k] - mn[k]) / (mx[k] - mn[k]) : 0;
+
+        scores[c] = { cpc: Math.round(s * 10) / 10, raw: raw[c], norm };
+    }
+    return scores;
+}
+
+// ===== FORMATTING =====
+function fmt(n) {
+    if (!n && n !== 0) return '—';
+    if (n >= 1e6) return (n/1e6).toFixed(1) + 'M';
+    if (n >= 1e4) return (n/1e3).toFixed(0) + 'K';
+    if (n >= 1e3) return n.toLocaleString();
+    return n.toFixed(n < 10 ? 1 : 0);
+}
+
+// ===== RENDER =====
+function render(scores, countries) {
+    const sorted = [...countries].sort((a, b) => (scores[b]?.cpc || 0) - (scores[a]?.cpc || 0));
+    const el = document.getElementById('results');
+    const top = sorted[0], bot = sorted[sorted.length - 1];
+    const ti = C[top] || {n:top,f:''}, bi = C[bot] || {n:bot,f:''};
+    const ts = scores[top]?.cpc || 0, bs = scores[bot]?.cpc || 0;
+
+    let insight = `<strong>${ti.f} ${ti.n}</strong> leads with a CPC score of <strong>${ts}</strong>`;
+    if (sorted.length > 1) insight += `, while <strong>${bi.f} ${bi.n}</strong> scores <strong>${bs}</strong> — a ${(ts-bs).toFixed(1)}-point gap.`;
+
+    const chartId = 'bubble-' + Date.now();
+    const dcId = 'dc-' + Date.now();
+    const aiId = 'ai-' + Date.now();
+
+    // Country cards HTML
+    const cards = sorted.map((c, i) => {
+        const s = scores[c], info = C[c] || {n:c,f:''};
+        const cls = s.cpc >= 55 ? 'high' : s.cpc >= 25 ? 'mid' : 'low';
+        const radarId = `radar-${Date.now()}-${i}`;
+        return `
+        <div class="country-card animate-in" onclick="this.classList.toggle('expanded')">
+            <div class="card-header">
+                <div class="card-country">
+                    <span class="card-flag">${info.f}</span>
+                    <div>
+                        <div class="card-name">${info.n}</div>
+                        <div class="card-rank">#${i + 1} of ${sorted.length}</div>
+                    </div>
+                </div>
+                <div class="card-score ${cls}">${s.cpc}</div>
+            </div>
+            <div class="card-radar"><canvas id="${radarId}"></canvas></div>
+            <div class="card-details">
+                <div class="card-detail-row"><span class="label">GDP per capita</span><span class="value">$${fmt(s.raw.gdp)}</span></div>
+                <div class="card-detail-row"><span class="label">Internet users</span><span class="value">${s.raw.net ? s.raw.net.toFixed(0)+'%' : '—'}</span></div>
+                <div class="card-detail-row"><span class="label">Broadband / 100</span><span class="value">${s.raw.bb ? s.raw.bb.toFixed(1) : '—'}</span></div>
+                <div class="card-detail-row"><span class="label">R&D % of GDP</span><span class="value">${s.raw.rd ? s.raw.rd.toFixed(2)+'%' : '—'}</span></div>
+                <div class="card-detail-row"><span class="label">Supercomputers</span><span class="value">${fmt(s.raw._sc)} TFLOPS</span></div>
+                <div class="card-detail-row"><span class="label">Data centers</span><span class="value">${s.raw._dc || '—'}</span></div>
+                <div class="card-detail-row"><span class="label">AI publications</span><span class="value">${fmt(s.raw._ai)}/yr</span></div>
+                <div class="card-detail-row"><span class="label">GPU H100 $/hr</span><span class="value">${s.raw.gpu ? '$'+s.raw.gpu.toFixed(2) : '—'}</span></div>
+            </div>
+        </div>`;
+    }).join('');
+
+    el.innerHTML = `
+        <div class="insight-hero animate-in">
+            <h2>Compute Readiness Index</h2>
+            <p>${insight}</p>
+        </div>
+        <div class="chart-section animate-in">
+            <div class="section-label">CPC Score by Country</div>
+            <div class="chart-container"><canvas id="${chartId}"></canvas></div>
+        </div>
+        <div class="mini-row">
+            <div class="mini-panel animate-in">
+                <div class="section-label">🏢 Data Centers</div>
+                <div class="mini-chart-container"><canvas id="${dcId}"></canvas></div>
+            </div>
+            <div class="mini-panel animate-in">
+                <div class="section-label">🧠 AI Research Papers</div>
+                <div class="mini-chart-container"><canvas id="${aiId}"></canvas></div>
+            </div>
+        </div>
+        <div class="cards-section">
+            <div class="section-label" style="padding-left:0.25rem;">Country Profiles · Tap to expand</div>
+            <div class="cards-grid">${cards}</div>
+        </div>
+        <div class="sources">
+            World Bank · UN SDG · UN Energy · TOP500 (Nov 2024) · DataCenterMap · Stanford HAI AI Index 2025 · GetDeploying GPU Pricing
+        </div>
+    `;
+
+    // ===== MAIN BUBBLE CHART =====
+    const ctx = document.getElementById(chartId).getContext('2d');
+    new Chart(ctx, {
+        type: 'bubble',
+        data: {
+            datasets: sorted.map((c, i) => {
+                const s = scores[c], info = C[c] || {n:c};
+                const color = s.cpc >= 55 ? 'rgba(110,231,183,' : s.cpc >= 25 ? 'rgba(251,191,36,' : 'rgba(248,113,113,';
+                const pop = s.raw._pop || 1;
+                return {
+                    label: info.f + ' ' + info.n,
+                    data: [{ x: s.raw.gdp, y: s.cpc, r: Math.max(4, Math.min(30, Math.sqrt(pop / 1e6) * 1.5)) }],
+                    backgroundColor: color + '0.5)',
+                    borderColor: color + '0.9)',
+                    borderWidth: 1.5,
+                };
+            })
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: '#151c2c', titleColor: '#e8ecf4', bodyColor: '#7b8baa',
+                    borderColor: '#2a3a58', borderWidth: 1, padding: 12, cornerRadius: 10,
+                    titleFont: { family: 'Space Grotesk', weight: 600 },
+                    callbacks: {
+                        title: ctx => ctx[0].dataset.label,
+                        label: ctx => [
+                            `CPC Score: ${ctx.raw.y}`,
+                            `GDP/Capita: $${fmt(ctx.raw.x)}`,
+                        ]
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    title: { display: true, text: 'GDP per Capita (USD)', color: '#4a5a78', font: { size: 11 } },
+                    grid: { color: 'rgba(30,42,66,0.5)' }, ticks: { color: '#4a5a78', callback: v => '$' + fmt(v) }
+                },
+                y: {
+                    title: { display: true, text: 'CPC Score', color: '#4a5a78', font: { size: 11 } },
+                    beginAtZero: true, max: 100,
+                    grid: { color: 'rgba(30,42,66,0.5)' }, ticks: { color: '#4a5a78' }
+                }
+            }
+        }
+    });
+
+    // ===== MINI CHARTS =====
+    const dcSort = [...sorted].sort((a,b) => (scores[b]?.raw._dc||0)-(scores[a]?.raw._dc||0));
+    new Chart(document.getElementById(dcId).getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: dcSort.map(c => (C[c]?.f||'') + ' ' + (C[c]?.n||c)),
+            datasets: [{ data: dcSort.map(c => scores[c]?.raw._dc||0), backgroundColor: 'rgba(196,181,253,0.45)', borderColor: '#c4b5fd', borderWidth: 1, borderRadius: 4 }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false, indexAxis: 'y',
+            plugins: { legend: { display: false }, tooltip: { backgroundColor: '#151c2c', borderColor: '#2a3a58', borderWidth: 1 } },
+            scales: { x: { grid: { color: 'rgba(30,42,66,0.3)' }, ticks: { color: '#4a5a78', font: { size: 10 } } }, y: { grid: { display: false }, ticks: { color: '#7b8baa', font: { size: 10 } } } }
+        }
+    });
+
+    const aiSort = [...sorted].sort((a,b) => (scores[b]?.raw._ai||0)-(scores[a]?.raw._ai||0));
+    new Chart(document.getElementById(aiId).getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: aiSort.map(c => (C[c]?.f||'') + ' ' + (C[c]?.n||c)),
+            datasets: [{ data: aiSort.map(c => scores[c]?.raw._ai||0), backgroundColor: 'rgba(129,140,248,0.45)', borderColor: '#818cf8', borderWidth: 1, borderRadius: 4 }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false, indexAxis: 'y',
+            plugins: { legend: { display: false }, tooltip: { backgroundColor: '#151c2c', borderColor: '#2a3a58', borderWidth: 1 } },
+            scales: { x: { grid: { color: 'rgba(30,42,66,0.3)' }, ticks: { color: '#4a5a78', font: { size: 10 } } }, y: { grid: { display: false }, ticks: { color: '#7b8baa', font: { size: 10 } } } }
+        }
+    });
+
+    // ===== RADAR CHARTS IN CARDS =====
+    sorted.forEach((c, i) => {
+        const radarId = `radar-${chartId.split('-')[1]}-${i}`;
+        // IDs were generated with Date.now() — re-derive
+    });
+    // Use querySelectorAll to find the canvases
+    document.querySelectorAll('.card-radar canvas').forEach((canvas, i) => {
+        const c = sorted[i];
+        const n = scores[c]?.norm || {};
+        new Chart(canvas.getContext('2d'), {
+            type: 'radar',
+            data: {
+                labels: ['R&D', 'Compute', 'Broadband', 'Data Ctrs', 'AI Pubs', 'Internet'],
+                datasets: [{
+                    data: [n.rd||0, n.sc||0, n.bb||0, n.dc||0, n.ai||0, n.net||0].map(v => v * 100),
+                    backgroundColor: scores[c].cpc >= 55 ? 'rgba(110,231,183,0.15)' : scores[c].cpc >= 25 ? 'rgba(251,191,36,0.12)' : 'rgba(248,113,113,0.12)',
+                    borderColor: scores[c].cpc >= 55 ? '#6ee7b7' : scores[c].cpc >= 25 ? '#fbbf24' : '#f87171',
+                    borderWidth: 1.5,
+                    pointRadius: 0,
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    r: {
+                        beginAtZero: true, max: 100,
+                        grid: { color: 'rgba(30,42,66,0.4)' },
+                        angleLines: { color: 'rgba(30,42,66,0.3)' },
+                        pointLabels: { color: '#4a5a78', font: { size: 9 } },
+                        ticks: { display: false },
+                    }
+                }
+            }
+        });
+    });
+}
+
+// ===== MAIN =====
+async function handleQuery() {
+    const input = document.getElementById('query');
+    const btn = document.getElementById('askBtn');
+    const el = document.getElementById('results');
+    const q = input.value.trim();
+    if (!q) return;
+
+    btn.disabled = true; btn.textContent = '…';
+    el.innerHTML = '<div class="loading"><div class="spinner"></div><br>Querying live data…</div>';
+
+    try {
+        const { countries } = parseQuery(q);
+        const data = await fetchAll(countries);
+        const scores_ = score(data, countries);
+        render(scores_, countries);
+    } catch(e) {
+        el.innerHTML = `<div class="error-msg">Something went wrong: ${e.message}</div>`;
+    } finally {
+        btn.disabled = false; btn.textContent = 'Explore';
+    }
+}
+
+function runQuery(q) { document.getElementById('query').value = q; handleQuery(); }
+document.getElementById('query').addEventListener('keydown', e => { if (e.key === 'Enter') handleQuery(); });
+</script>
+
+</body>
+</html>
