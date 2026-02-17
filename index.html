@@ -392,7 +392,209 @@
 
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* ===== INSIGHT HERO ===== */
+        /* ===== AI NARRATIVE BLOCK ===== */
+        .ai-narrative {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2rem 2.25rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .ai-narrative::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            border-radius: 20px 20px 0 0;
+            background: linear-gradient(90deg, var(--accent), var(--mint), var(--accent));
+        }
+
+        .ai-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--accent);
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .ai-badge .pulse {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--accent);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .ai-narrative h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.35rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 0.75rem;
+            letter-spacing: -0.01em;
+            line-height: 1.35;
+        }
+
+        .ai-narrative p {
+            color: var(--text-dim);
+            font-size: 0.88rem;
+            line-height: 1.75;
+            font-weight: 300;
+        }
+
+        .ai-narrative p strong { color: var(--text); font-weight: 500; }
+
+        .ai-narrative .typewriter {
+            overflow: hidden;
+        }
+
+        /* ===== KEY METRICS STRIP ===== */
+        .metric-strip {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .metric-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.1rem 1.25rem;
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            border-color: var(--border-light);
+            box-shadow: 0 4px 16px var(--card-hover-shadow);
+        }
+
+        .metric-card .metric-label {
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-bottom: 0.35rem;
+        }
+
+        .metric-card .metric-value {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text);
+            line-height: 1.2;
+        }
+
+        .metric-card .metric-detail {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            margin-top: 0.2rem;
+            font-weight: 400;
+        }
+
+        .metric-card .metric-value.accent { color: var(--accent); }
+        .metric-card .metric-value.mint { color: var(--mint); }
+        .metric-card .metric-value.gold { color: var(--gold); }
+        .metric-card .metric-value.coral { color: var(--coral); }
+
+        /* ===== DATA TABLE ===== */
+        .data-table-section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+        }
+
+        .data-table thead th {
+            text-align: left;
+            padding: 0.6rem 0.75rem;
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            font-weight: 600;
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+            cursor: pointer;
+            user-select: none;
+            transition: color 0.2s;
+        }
+
+        .data-table thead th:hover { color: var(--accent); }
+        .data-table thead th.sorted { color: var(--accent); }
+        .data-table thead th .sort-arrow { font-size: 0.5rem; margin-left: 0.25rem; }
+
+        .data-table tbody tr {
+            transition: background 0.15s;
+        }
+
+        .data-table tbody tr:hover { background: var(--accent-soft); }
+
+        .data-table tbody td {
+            padding: 0.65rem 0.75rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-dim);
+            font-weight: 400;
+            white-space: nowrap;
+        }
+
+        .data-table tbody td:first-child { color: var(--text); font-weight: 500; }
+
+        .data-table .score-cell {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .data-table .score-cell.high { color: var(--mint); }
+        .data-table .score-cell.mid { color: var(--gold); }
+        .data-table .score-cell.low { color: var(--coral); }
+
+        .data-table .rank-cell {
+            font-family: 'Space Grotesk', sans-serif;
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        .data-table .bar-cell {
+            padding: 0.65rem 0.75rem;
+            min-width: 100px;
+        }
+
+        .mini-bar {
+            height: 6px;
+            border-radius: 3px;
+            background: var(--surface-3);
+            overflow: hidden;
+        }
+
+        .mini-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.6s ease;
+        }
+
+        /* ===== INSIGHT HERO (legacy compat) ===== */
         .insight-hero {
             text-align: center;
             padding: 2rem 0 3rem;
@@ -417,6 +619,29 @@
         }
 
         .insight-hero p strong { color: var(--text); font-weight: 500; }
+
+        /* ===== SECTION DIVIDER ===== */
+        .section-divider {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 2rem 0 1.25rem;
+        }
+
+        .section-divider .divider-line {
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .section-divider .divider-label {
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            font-weight: 600;
+            white-space: nowrap;
+        }
 
         /* ===== BUBBLE CHART ===== */
         .chart-section {
@@ -609,6 +834,13 @@
             .country-card { border-radius: 14px; }
             .nav-link.hide-mobile { display: none; }
             .nav-divider.hide-mobile { display: none; }
+            .ai-narrative { padding: 1.25rem 1.5rem; border-radius: 14px; }
+            .metric-strip { grid-template-columns: repeat(2, 1fr); }
+            .metric-card .metric-value { font-size: 1.15rem; }
+            .data-table-section { padding: 1rem; border-radius: 14px; }
+            .data-table { font-size: 0.72rem; }
+            .data-table thead th { padding: 0.5rem; }
+            .data-table tbody td { padding: 0.5rem; }
         }
 
         @media (max-width: 400px) {
@@ -826,40 +1058,172 @@ const C = {
     'country/BGD':{n:'Bangladesh',f:'\u{1F1E7}\u{1F1E9}',i:'BGD'},'country/PAK':{n:'Pakistan',f:'\u{1F1F5}\u{1F1F0}',i:'PAK'},
 };
 
-// ===== QUERY PARSING =====
+// ===== SMART QUERY PARSER =====
+// Enhanced NLP-style parser with alias matching, fuzzy intent detection, and focus extraction
 function parseQuery(q) {
-    q = q.toLowerCase();
-    const mentioned = [];
-    for (const [dcid, info] of Object.entries(C)) {
-        if (q.includes(info.n.toLowerCase()) || q.includes(info.i.toLowerCase())) mentioned.push(dcid);
-    }
-    let type = 'compare';
-    if (q.match(/top|rank|best|highest|leader/)) type = 'ranking';
-    if (q.match(/divide|gap|inequal/)) type = 'divide';
-    if (q.includes('africa')) type = 'africa';
-    if (q.match(/g7|g-7/)) type = 'g7';
-    if (q.match(/g20|g-20/)) type = 'g20';
-    if (q.includes('europe')) type = 'europe';
-    if (q.match(/asia|asean/)) type = 'asia';
-    if (q.match(/ai research|ai paper|publication/)) type = 'ai_research';
-    if (q.match(/data center|datacenter|infrastructure/)) type = 'data_centers';
+    const ql = q.toLowerCase().trim();
 
-    let countries = mentioned;
-    const presets = {
-        ranking: ['country/USA','country/CHN','country/JPN','country/DEU','country/KOR','country/GBR','country/FRA','country/CHE','country/FIN','country/SGP'],
-        g7: ['country/USA','country/GBR','country/FRA','country/DEU','country/ITA','country/CAN','country/JPN'],
-        g20: ['country/USA','country/CHN','country/JPN','country/DEU','country/GBR','country/FRA','country/IND','country/ITA','country/BRA','country/CAN','country/KOR','country/AUS','country/MEX','country/IDN','country/TUR','country/SAU','country/ARG','country/ZAF','country/RUS'],
-        africa: ['country/ZAF','country/NGA','country/KEN','country/EGY','country/GHA','country/RWA','country/ETH'],
-        europe: ['country/DEU','country/FRA','country/GBR','country/NLD','country/SWE','country/FIN','country/NOR','country/CHE'],
-        asia: ['country/CHN','country/JPN','country/KOR','country/SGP','country/IND','country/THA','country/VNM','country/MYS','country/TWN'],
-        divide: ['country/USA','country/CHE','country/SGP','country/NOR','country/NGA','country/BGD','country/ETH','country/PAK'],
-        ai_research: ['country/CHN','country/USA','country/IND','country/GBR','country/DEU','country/KOR','country/JPN','country/FRA','country/CAN','country/ITA'],
-        data_centers: ['country/USA','country/DEU','country/GBR','country/CHN','country/CAN','country/FRA','country/AUS','country/NLD','country/JPN','country/BRA'],
+    // --- 1. Country extraction with aliases ---
+    const aliases = {
+        'country/USA': ['us','usa','u.s.','united states','america','american','states'],
+        'country/CHN': ['china','chinese','prc','beijing'],
+        'country/IND': ['india','indian','delhi','mumbai'],
+        'country/DEU': ['germany','german','deutschland','berlin'],
+        'country/JPN': ['japan','japanese','tokyo'],
+        'country/GBR': ['uk','united kingdom','britain','british','england','london'],
+        'country/FRA': ['france','french','paris'],
+        'country/KOR': ['south korea','korea','korean','seoul'],
+        'country/CAN': ['canada','canadian','toronto','ottawa'],
+        'country/AUS': ['australia','australian','sydney','melbourne'],
+        'country/BRA': ['brazil','brazilian','sao paulo'],
+        'country/ITA': ['italy','italian','rome','milan'],
+        'country/NLD': ['netherlands','dutch','holland','amsterdam'],
+        'country/ESP': ['spain','spanish','madrid','barcelona'],
+        'country/CHE': ['switzerland','swiss','zurich','geneva'],
+        'country/SWE': ['sweden','swedish','stockholm'],
+        'country/SGP': ['singapore','singaporean'],
+        'country/ISR': ['israel','israeli','tel aviv'],
+        'country/NOR': ['norway','norwegian','oslo'],
+        'country/FIN': ['finland','finnish','helsinki'],
+        'country/DNK': ['denmark','danish','copenhagen'],
+        'country/TWN': ['taiwan','taiwanese','taipei'],
+        'country/SAU': ['saudi','saudi arabia','riyadh'],
+        'country/ARE': ['uae','emirates','dubai','abu dhabi'],
+        'country/POL': ['poland','polish','warsaw'],
+        'country/RUS': ['russia','russian','moscow'],
+        'country/MEX': ['mexico','mexican'],
+        'country/IDN': ['indonesia','indonesian','jakarta'],
+        'country/TUR': ['turkey','turkish','ankara','istanbul','türkiye'],
+        'country/ZAF': ['south africa','south african','johannesburg','cape town'],
+        'country/NGA': ['nigeria','nigerian','lagos'],
+        'country/KEN': ['kenya','kenyan','nairobi'],
+        'country/EGY': ['egypt','egyptian','cairo'],
+        'country/GHA': ['ghana','ghanaian','accra'],
+        'country/RWA': ['rwanda','rwandan','kigali'],
+        'country/ETH': ['ethiopia','ethiopian','addis'],
+        'country/THA': ['thailand','thai','bangkok'],
+        'country/VNM': ['vietnam','vietnamese','hanoi','ho chi minh'],
+        'country/MYS': ['malaysia','malaysian','kuala lumpur'],
+        'country/PHL': ['philippines','filipino','manila'],
+        'country/CHL': ['chile','chilean','santiago'],
+        'country/COL': ['colombia','colombian','bogota'],
+        'country/ARG': ['argentina','argentinian','buenos aires'],
+        'country/IRL': ['ireland','irish','dublin'],
+        'country/AUT': ['austria','austrian','vienna'],
+        'country/PRT': ['portugal','portuguese','lisbon'],
+        'country/CZE': ['czech','czech republic','czechia','prague'],
+        'country/NZL': ['new zealand','nz','kiwi','auckland','wellington'],
+        'country/BGD': ['bangladesh','bangladeshi','dhaka'],
+        'country/PAK': ['pakistan','pakistani','islamabad','karachi'],
     };
-    if (countries.length === 0 || (type !== 'compare' && countries.length === 0)) {
+
+    const mentioned = new Set();
+    // First pass: check ISO codes from C map
+    for (const [dcid, info] of Object.entries(C)) {
+        if (ql.includes(info.n.toLowerCase()) || new RegExp('\\b' + info.i.toLowerCase() + '\\b').test(ql)) {
+            mentioned.add(dcid);
+        }
+    }
+    // Second pass: aliases (catches things like "US", "UK", "Dutch", city names)
+    for (const [dcid, aliasList] of Object.entries(aliases)) {
+        for (const alias of aliasList) {
+            if (new RegExp('\\b' + alias.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b').test(ql)) {
+                mentioned.add(dcid);
+                break;
+            }
+        }
+    }
+
+    // --- 2. Intent detection (multi-signal) ---
+    let type = 'compare';
+    let focus = null; // what data dimension to emphasize
+
+    // Group presets
+    if (ql.match(/\bg7\b|\bg-7\b/)) type = 'g7';
+    else if (ql.match(/\bg20\b|\bg-20\b/)) type = 'g20';
+    else if (ql.match(/\bbrics?\b/)) type = 'brics';
+    else if (ql.match(/\bnordic\b|\bscandinavi/)) type = 'nordic';
+    else if (ql.match(/\bsoutheast asia\b|\basean\b/)) type = 'asean';
+    else if (ql.match(/\basia\b|\basian\b/) && !ql.match(/southeast/)) type = 'asia';
+    else if (ql.match(/\bafrica\b|\bafrican\b/)) type = 'africa';
+    else if (ql.match(/\beurope\b|\beuropean\b|\beu\b/)) type = 'europe';
+    else if (ql.match(/\blatin america\b|\blatam\b|\bsouth america\b/)) type = 'latam';
+    else if (ql.match(/\bmiddle east\b|\bmena\b|\bgulf\b|\bgcc\b/)) type = 'mena';
+    // Thematic intents
+    else if (ql.match(/top|rank|best|highest|leader|strongest|most\b/)) type = 'ranking';
+    else if (ql.match(/bottom|worst|lowest|weakest|least|lagg/)) type = 'ranking_bottom';
+    else if (ql.match(/divide|gap|inequal|disparity|vs.*poor|rich.*poor/)) type = 'divide';
+    else if (ql.match(/trend|over time|growth|progress|change|improv/)) type = 'trend';
+    else if (ql.match(/\bwhy\b|\bexplain\b|\breason\b|\bbecause\b/)) type = 'explain';
+    else if (ql.match(/predict|forecast|future|will|2030|2035|project/)) type = 'forecast';
+
+    // Focus detection (what specific dimension is the user asking about?)
+    if (ql.match(/\bai\b.*\b(research|paper|publication|talent)/)) focus = 'ai_research';
+    else if (ql.match(/data center|datacenter|server farm|cloud infrastructure/)) focus = 'data_centers';
+    else if (ql.match(/supercomputer|hpc|flops|compute power|top500/)) focus = 'supercompute';
+    else if (ql.match(/internet|connectivity|broadband|fiber|digital access/)) focus = 'connectivity';
+    else if (ql.match(/gpu|chip|semiconductor|nvidia|hardware/)) focus = 'gpu';
+    else if (ql.match(/\br&d\b|r ?& ?d|research.*development|spending|investment/)) focus = 'rd';
+    else if (ql.match(/gdp|econom|wealth|income|rich|poor|prosper/)) focus = 'economic';
+    else if (ql.match(/energy|electricity|power grid|renewable/)) focus = 'energy';
+
+    // --- 3. Country selection ---
+    let countries = [...mentioned];
+    const presets = {
+        ranking:        ['country/USA','country/CHN','country/JPN','country/DEU','country/KOR','country/GBR','country/FRA','country/CHE','country/FIN','country/SGP'],
+        ranking_bottom: ['country/BGD','country/PAK','country/ETH','country/GHA','country/NGA','country/RWA','country/KEN','country/EGY','country/VNM','country/PHL'],
+        g7:             ['country/USA','country/GBR','country/FRA','country/DEU','country/ITA','country/CAN','country/JPN'],
+        g20:            ['country/USA','country/CHN','country/JPN','country/DEU','country/GBR','country/FRA','country/IND','country/ITA','country/BRA','country/CAN','country/KOR','country/AUS','country/MEX','country/IDN','country/TUR','country/SAU','country/ARG','country/ZAF','country/RUS'],
+        brics:          ['country/BRA','country/RUS','country/IND','country/CHN','country/ZAF','country/EGY','country/ETH','country/SAU','country/ARE'],
+        nordic:         ['country/SWE','country/NOR','country/FIN','country/DNK'],
+        africa:         ['country/ZAF','country/NGA','country/KEN','country/EGY','country/GHA','country/RWA','country/ETH'],
+        europe:         ['country/DEU','country/FRA','country/GBR','country/NLD','country/SWE','country/FIN','country/NOR','country/CHE','country/IRL','country/ESP','country/ITA'],
+        asia:           ['country/CHN','country/JPN','country/KOR','country/SGP','country/IND','country/THA','country/VNM','country/MYS','country/TWN'],
+        asean:          ['country/SGP','country/THA','country/VNM','country/MYS','country/IDN','country/PHL'],
+        latam:          ['country/BRA','country/MEX','country/ARG','country/CHL','country/COL'],
+        mena:           ['country/SAU','country/ARE','country/ISR','country/EGY','country/TUR'],
+        divide:         ['country/USA','country/CHE','country/SGP','country/NOR','country/NGA','country/BGD','country/ETH','country/PAK'],
+    };
+    if (countries.length === 0) {
         countries = presets[type] || ['country/USA','country/CHN','country/IND','country/DEU','country/JPN'];
     }
-    return { type, countries };
+
+    // --- 4. Generate a response title based on intent ---
+    let title = 'Compute Readiness Comparison';
+    const titleMap = {
+        ranking: 'Top Compute-Ready Nations',
+        ranking_bottom: 'Nations with Lowest Compute Readiness',
+        g7: 'G7 Compute Readiness',
+        g20: 'G20 Compute Readiness',
+        brics: 'BRICS+ Compute Readiness',
+        nordic: 'Nordic Nations: Compute Readiness',
+        africa: 'African Compute Landscape',
+        europe: 'European Compute Readiness',
+        asia: 'Asian Compute Readiness',
+        asean: 'ASEAN Digital Infrastructure',
+        latam: 'Latin America: Compute Readiness',
+        mena: 'Middle East & North Africa: Compute Readiness',
+        divide: 'The Global Compute Divide',
+        trend: 'Compute Readiness Trends',
+        explain: 'Compute Readiness Explained',
+        forecast: 'Compute Readiness Outlook',
+    };
+    if (titleMap[type]) title = titleMap[type];
+    if (mentioned.size === 2) {
+        const [a, b] = [...mentioned];
+        title = `${C[a]?.f||''} ${C[a]?.n||a} vs ${C[b]?.f||''} ${C[b]?.n||b}`;
+    }
+    if (focus) {
+        const focusLabels = {
+            ai_research: 'AI Research', data_centers: 'Data Center Infrastructure',
+            supercompute: 'Supercomputing Power', connectivity: 'Digital Connectivity',
+            gpu: 'GPU & Semiconductor Access', rd: 'R&D Investment',
+            economic: 'Economic Foundation', energy: 'Energy Infrastructure',
+        };
+        if (focusLabels[focus] && mentioned.size !== 2) title += ': ' + focusLabels[focus];
+    }
+
+    return { type, countries, focus, title, query: q };
 }
 
 // ===== API =====
@@ -955,22 +1319,110 @@ function chartColors() {
     };
 }
 
+// ===== AI NARRATIVE GENERATOR =====
+// Generates contextual insight text from the computed scores
+function generateNarrative(scores, sorted, parsed) {
+    const top3 = sorted.slice(0, 3);
+    const bot3 = sorted.slice(-3).reverse();
+    const topInfo = top3.map(c => ({ ...C[c], cpc: scores[c]?.cpc || 0, dcid: c }));
+    const botInfo = bot3.map(c => ({ ...C[c], cpc: scores[c]?.cpc || 0, dcid: c }));
+    const gap = topInfo[0].cpc - botInfo[0].cpc;
+    const avg = sorted.reduce((s, c) => s + (scores[c]?.cpc || 0), 0) / sorted.length;
+
+    // Find standout metrics
+    const standouts = [];
+    for (const c of sorted) {
+        const s = scores[c];
+        if (s?.norm?.sc > 0.9) standouts.push(`${C[c]?.n} dominates in raw supercomputing power`);
+        if (s?.norm?.ai > 0.9 && s?.norm?.sc < 0.5) standouts.push(`${C[c]?.n} punches above its weight in AI research despite limited compute`);
+        if (s?.raw?.rd > 3) standouts.push(`${C[c]?.n}'s R&D spending (${s.raw.rd.toFixed(1)}% of GDP) signals strong future positioning`);
+        if (s?.cpc > 50 && s?.raw?._pop > 100e6) standouts.push(`${C[c]?.n} achieves high compute readiness at massive population scale`);
+        if (s?.raw?.gpu && s?.raw?.gpu < 2.2) standouts.push(`${C[c]?.n} offers among the lowest GPU access costs`);
+    }
+
+    let narrative = '';
+
+    // Opening line
+    narrative += `<strong>${topInfo[0].f} ${topInfo[0].n}</strong> leads this comparison with a CPC score of <strong>${topInfo[0].cpc}</strong>`;
+    if (sorted.length > 1) {
+        narrative += `, ${gap.toFixed(0)}+ points ahead of <strong>${botInfo[0].f} ${botInfo[0].n}</strong> (${botInfo[0].cpc})`;
+    }
+    narrative += '. ';
+
+    // Context by type
+    if (parsed.type === 'divide') {
+        const ratio = botInfo[0].cpc > 0 ? (topInfo[0].cpc / botInfo[0].cpc).toFixed(1) + 'x' : 'dramatically';
+        narrative += `The compute divide is stark: the group average is ${avg.toFixed(1)}, but the top tier scores ${ratio} higher than the bottom. `;
+        narrative += 'Access to AI infrastructure increasingly determines economic competitiveness. ';
+    } else if (parsed.type === 'g7') {
+        narrative += `Among G7 nations, the average CPC is ${avg.toFixed(1)}. `;
+        if (gap > 15) narrative += `A notable ${gap.toFixed(0)}-point spread exists even among the world\'s largest economies. `;
+    } else if (parsed.type === 'africa') {
+        narrative += `Africa\'s compute readiness averages ${avg.toFixed(1)}, reflecting significant room for infrastructure investment. `;
+        if (topInfo[0].cpc > 15) narrative += `${topInfo[0].n} shows emerging leadership in the region. `;
+    } else if (sorted.length === 2) {
+        const a = scores[sorted[0]], b = scores[sorted[1]];
+        const strengths0 = [], strengths1 = [];
+        const dims = [['sc','supercomputing'],['dc','data centers'],['ai','AI research'],['rd','R&D spending'],['net','internet access'],['bb','broadband']];
+        for (const [k, label] of dims) {
+            if ((a?.norm?.[k]||0) > (b?.norm?.[k]||0) + 0.2) strengths0.push(label);
+            else if ((b?.norm?.[k]||0) > (a?.norm?.[k]||0) + 0.2) strengths1.push(label);
+        }
+        if (strengths0.length) narrative += `${C[sorted[0]]?.n} leads in ${strengths0.join(', ')}. `;
+        if (strengths1.length) narrative += `${C[sorted[1]]?.n} counters with strength in ${strengths1.join(', ')}. `;
+    } else {
+        if (sorted.length >= 5) narrative += `The group average is ${avg.toFixed(1)} across ${sorted.length} nations. `;
+    }
+
+    // Standout insight (pick best one)
+    if (standouts.length > 0) {
+        narrative += standouts[0] + '. ';
+    }
+
+    return narrative;
+}
+
 // ===== RENDER =====
-function render(scores, countries) {
+function render(scores, countries, parsed) {
     const sorted = [...countries].sort((a, b) => (scores[b]?.cpc || 0) - (scores[a]?.cpc || 0));
     const el = document.getElementById('results');
-    const top = sorted[0], bot = sorted[sorted.length - 1];
-    const ti = C[top] || {n:top,f:''}, bi = C[bot] || {n:bot,f:''};
-    const ts = scores[top]?.cpc || 0, bs = scores[bot]?.cpc || 0;
     const cc = chartColors();
 
-    let insight = `<strong>${ti.f} ${ti.n}</strong> leads with a CPC score of <strong>${ts}</strong>`;
-    if (sorted.length > 1) insight += `, while <strong>${bi.f} ${bi.n}</strong> scores <strong>${bs}</strong> \u2014 a ${(ts-bs).toFixed(1)}-point gap.`;
+    const narrative = generateNarrative(scores, sorted, parsed);
+    const title = parsed.title || 'Compute Readiness Comparison';
+
+    // --- Key metrics ---
+    const topC = sorted[0], botC = sorted[sorted.length - 1];
+    const topS = scores[topC]?.cpc || 0, botS = scores[botC]?.cpc || 0;
+    const avg = sorted.reduce((s, c) => s + (scores[c]?.cpc || 0), 0) / sorted.length;
+    const totalDC = sorted.reduce((s, c) => s + (scores[c]?.raw?._dc || 0), 0);
+    const totalAI = sorted.reduce((s, c) => s + (scores[c]?.raw?._ai || 0), 0);
 
     const chartId = 'bubble-' + Date.now();
     const dcId = 'dc-' + Date.now();
     const aiId = 'ai-' + Date.now();
 
+    // --- Data Table ---
+    const tableRows = sorted.map((c, i) => {
+        const s = scores[c], info = C[c] || {n:c,f:''};
+        const cls = s.cpc >= 55 ? 'high' : s.cpc >= 25 ? 'mid' : 'low';
+        const barPct = Math.round((s.cpc / (scores[sorted[0]]?.cpc || 1)) * 100);
+        const barColor = s.cpc >= 55 ? 'var(--mint)' : s.cpc >= 25 ? 'var(--gold)' : 'var(--coral)';
+        return `<tr>
+            <td class="rank-cell">${i + 1}</td>
+            <td>${info.f} ${info.n}</td>
+            <td class="score-cell ${cls}">${s.cpc}</td>
+            <td class="bar-cell"><div class="mini-bar"><div class="mini-bar-fill" style="width:${barPct}%;background:${barColor}"></div></div></td>
+            <td>$${fmt(s.raw.gdp)}</td>
+            <td>${s.raw.bb ? s.raw.bb.toFixed(1) : '\u2014'}</td>
+            <td>${s.raw.rd ? s.raw.rd.toFixed(2)+'%' : '\u2014'}</td>
+            <td>${fmt(s.raw._sc)}</td>
+            <td>${s.raw._dc || '\u2014'}</td>
+            <td>${fmt(s.raw._ai)}</td>
+        </tr>`;
+    }).join('');
+
+    // --- Country Cards ---
     const cards = sorted.map((c, i) => {
         const s = scores[c], info = C[c] || {n:c,f:''};
         const cls = s.cpc >= 55 ? 'high' : s.cpc >= 25 ? 'mid' : 'low';
@@ -1000,15 +1452,72 @@ function render(scores, countries) {
         </div>`;
     }).join('');
 
+    // ===== ASSEMBLE THE FULL RESPONSE TEMPLATE =====
     el.innerHTML = `
-        <div class="insight-hero animate-in">
-            <h2>Compute Readiness Index</h2>
-            <p>${insight}</p>
+        <!-- 1. AI NARRATIVE -->
+        <div class="ai-narrative animate-in">
+            <div class="ai-badge"><span class="pulse"></span> CPC Intelligence</div>
+            <h2>${title}</h2>
+            <p class="typewriter">${narrative}</p>
         </div>
+
+        <!-- 2. KEY METRICS STRIP -->
+        <div class="metric-strip animate-in">
+            <div class="metric-card">
+                <div class="metric-label">#1 Ranked</div>
+                <div class="metric-value mint">${topS}</div>
+                <div class="metric-detail">${C[topC]?.f} ${C[topC]?.n}</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Group Average</div>
+                <div class="metric-value">${avg.toFixed(1)}</div>
+                <div class="metric-detail">${sorted.length} countries</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Score Gap</div>
+                <div class="metric-value ${(topS - botS) > 40 ? 'coral' : 'gold'}">${(topS - botS).toFixed(1)}</div>
+                <div class="metric-detail">Top vs Bottom</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Data Centers</div>
+                <div class="metric-value accent">${fmt(totalDC)}</div>
+                <div class="metric-detail">Combined total</div>
+            </div>
+        </div>
+
+        <!-- 3. MAIN CHART -->
         <div class="chart-section animate-in">
-            <div class="section-label">CPC Score by Country</div>
+            <div class="section-label">CPC Score vs GDP per Capita · Bubble size = population</div>
             <div class="chart-container"><canvas id="${chartId}"></canvas></div>
         </div>
+
+        <!-- 4. DATA TABLE -->
+        <div class="section-divider">
+            <div class="divider-line"></div>
+            <div class="divider-label">Rankings Table</div>
+            <div class="divider-line"></div>
+        </div>
+        <div class="data-table-section animate-in">
+            <table class="data-table" id="cpc-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Country</th>
+                        <th>CPC</th>
+                        <th></th>
+                        <th>GDP/Cap</th>
+                        <th>BB/100</th>
+                        <th>R&D%</th>
+                        <th>TFLOPS</th>
+                        <th>DCs</th>
+                        <th>AI Pubs</th>
+                    </tr>
+                </thead>
+                <tbody>${tableRows}</tbody>
+            </table>
+        </div>
+
+        <!-- 5. MINI CHARTS -->
         <div class="mini-row">
             <div class="mini-panel animate-in">
                 <div class="section-label">\u{1F3E2} Data Centers</div>
@@ -1019,12 +1528,21 @@ function render(scores, countries) {
                 <div class="mini-chart-container"><canvas id="${aiId}"></canvas></div>
             </div>
         </div>
+
+        <!-- 6. COUNTRY CARDS -->
+        <div class="section-divider">
+            <div class="divider-line"></div>
+            <div class="divider-label">Country Profiles · Tap to expand</div>
+            <div class="divider-line"></div>
+        </div>
         <div class="cards-section">
-            <div class="section-label" style="padding-left:0.25rem;">Country Profiles \u00B7 Tap to expand</div>
             <div class="cards-grid">${cards}</div>
         </div>
+
+        <!-- 7. METHODOLOGY + SOURCES -->
         <div class="sources">
-            World Bank \u00B7 UN SDG \u00B7 UN Energy \u00B7 TOP500 (Nov 2024) \u00B7 DataCenterMap \u00B7 Stanford HAI AI Index 2025 \u00B7 GetDeploying GPU Pricing
+            <strong>CPC Score</strong>: Weighted composite of 9 indicators (R&D 15%, Supercompute 18%, Broadband 12%, Data Centers 12%, AI Research 12%, Internet 10%, Energy 8%, GPU Cost 8%, GDP 5%) · Min-max normalized<br>
+            World Bank · UN SDG · UN Energy · TOP500 (Nov 2024) · DataCenterMap · Stanford HAI AI Index 2025 · GetDeploying GPU Pricing
         </div>
     `;
 
@@ -1136,6 +1654,38 @@ function render(scores, countries) {
             }
         });
     });
+
+    // ===== TYPEWRITER EFFECT on narrative =====
+    const tw = el.querySelector('.typewriter');
+    if (tw) {
+        const html = tw.innerHTML;
+        tw.innerHTML = '';
+        tw.style.visibility = 'visible';
+        let i = 0;
+        const chars = [];
+        // Parse HTML to preserve tags
+        let inTag = false;
+        for (const ch of html) {
+            if (ch === '<') inTag = true;
+            if (inTag) {
+                if (chars.length === 0 || typeof chars[chars.length-1] !== 'object') chars.push({tag:''});
+                chars[chars.length-1].tag += ch;
+                if (ch === '>') inTag = false;
+            } else {
+                chars.push(ch);
+            }
+        }
+        let buf = '';
+        function typeNext() {
+            if (i >= chars.length) return;
+            const ch = chars[i];
+            if (typeof ch === 'object') { buf += ch.tag; i++; typeNext(); return; }
+            buf += ch; i++;
+            tw.innerHTML = buf;
+            setTimeout(typeNext, 8 + Math.random() * 12);
+        }
+        setTimeout(typeNext, 400);
+    }
 }
 
 // ===== MAIN =====
@@ -1149,18 +1699,18 @@ async function handleQuery() {
     // Mark body as having results (moves suggestions to bottom bar)
     document.body.classList.add('has-results');
 
-    btn.disabled = true; btn.textContent = '\u2026';
-    el.innerHTML = '<div class="loading"><div class="spinner"></div><br>Querying live data\u2026</div>';
+    btn.disabled = true; btn.innerHTML = '&hellip;';
+    el.innerHTML = '<div class="loading"><div class="spinner"></div><br>Analyzing global compute data\u2026</div>';
 
     try {
-        const { countries } = parseQuery(q);
-        const data = await fetchAll(countries);
-        const scores_ = score(data, countries);
-        render(scores_, countries);
+        const parsed = parseQuery(q);
+        const data = await fetchAll(parsed.countries);
+        const scores_ = score(data, parsed.countries);
+        render(scores_, parsed.countries, parsed);
     } catch(e) {
         el.innerHTML = `<div class="error-msg">Something went wrong: ${e.message}</div>`;
     } finally {
-        btn.disabled = false; btn.textContent = 'Explore';
+        btn.disabled = false; btn.innerHTML = '&#8593;';
     }
 }
 
